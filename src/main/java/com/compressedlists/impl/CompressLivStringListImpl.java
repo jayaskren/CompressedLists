@@ -1,0 +1,174 @@
+package com.compressedlists.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.HdrHistogram.Histogram;
+
+import com.compressedlists.impl.buffer.IStringArrayBuffer;
+import com.compressedlists.impl.buffer.MemorySizeInfo;
+import com.compressedlists.impl.buffer.text.CompressedStringBuffer;
+import com.compressedlists.impl.buffer.text.UncompressedStringBuffer;
+import com.compressedlists.CompressedStringList;
+import com.compressedlists.DataType;
+
+public class CompressLivStringListImpl implements CompressedStringList {
+
+	Histogram histogram = null; //new Histogram(3600000000000L, 3);
+	private List<CompressedStringBuffer> buffers;
+	private int size = 0;
+	private long sizeInBytes = 0;
+	private UncompressedStringBuffer lastStringBuffer;
+	private UncompressedStringBuffer retrievedStringBuffer;
+	private int retrievedBufferNum = -1;
+	long totalTimeProcessed = 0l;
+	
+	public CompressLivStringListImpl(CompressedStringList column) {
+		this();
+		
+		for(int i=0; i<column.getSize(); i++) {
+			addValue(column.getValue(i));
+		}
+		lastStringBuffer = new UncompressedStringBuffer();
+		retrievedStringBuffer = new UncompressedStringBuffer();
+		if (column.getHistogram() != null) {
+			this.histogram = column.getHistogram().copy();
+		}
+	}
+	
+	public CompressLivStringListImpl() {
+		buffers = new ArrayList<>();
+		lastStringBuffer = new UncompressedStringBuffer();
+		retrievedStringBuffer = new UncompressedStringBuffer();
+	}
+	
+	@Override
+	public void addValue(String str) {
+		long begin = System.nanoTime();
+		lastStringBuffer.addValue(str);
+		size ++;
+//		System.out.println(size);
+		if (lastStringBuffer.getSize() == lastStringBuffer.BUFFER_SIZE) {
+			// TODO what is this all zeroes doing.  I think this was debugging?
+//			boolean allZeroes = true;
+//			for (int i=0; i < 10 ; i++) {
+//				if (lastStringBuffer.getValue(i) != "0"){
+//					allZeroes = false;
+//				}
+//			}
+//			if(allZeroes) {
+//				System.out.println("Error Adding " + str + " Found all Zeroes");
+//			}
+			CompressedStringBuffer buffer = lastStringBuffer.compressToBuffer();
+			buffers.add(buffer);
+			sizeInBytes += buffer.getSizeInBytes();
+			lastStringBuffer = new UncompressedStringBuffer();
+		}
+		long timeProcessed = System.nanoTime() - begin;
+		totalTimeProcessed += timeProcessed;
+		if (histogram != null) {
+			histogram.recordValue(timeProcessed);
+		}
+	}
+	
+	@Override
+	public void setValue(int i, String val) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public String getValue(int i) {
+		int bufferNum = i >> IStringArrayBuffer.NUM_BITS; // Divide by BUFFER_SIZE
+		int index = i & IStringArrayBuffer.BUFFER_SIZE_MODULO_MASK; // Modulo BUFFER_SIZE
+		
+		if (bufferNum == buffers.size()) {
+			// last buffer
+			return this.lastStringBuffer.getValue(index);
+		} else if (bufferNum == this.retrievedBufferNum) {
+//			if (index >= retrievedStringBuffer.getSize()) {
+//				System.out.println("Error at index " + index);
+//			}
+			return this.retrievedStringBuffer.getValue(index);
+		} else {
+			retrievedBufferNum = bufferNum;
+			this.buffers.get(bufferNum).uncompressToBuffer(retrievedStringBuffer);
+			return this.retrievedStringBuffer.getValue(index);
+		}
+		
+//		CompressedStringBuffer buffer = buffers.get(bufferNum);
+		
+//		if (i < buffer.compressedData.length ) {
+//			return String.valueOf(buffer.compressedData[i]);
+//		} else {
+//			return "NAN";
+//		}
+	}
+	
+	@Override
+	public DataType getDataType() {
+		return DataType.TEXT;
+	}
+
+	@Override
+	public int getSize() {
+		return size;
+	}
+
+	@Override
+	public String getValueDisplay(int i) {
+		return getValue(i);
+	}
+
+	@Override
+	public int getMaxSize() {
+		return Integer.MAX_VALUE;
+	}
+
+	@Override
+	public long getSizeInBytes() {
+		return sizeInBytes;
+	}
+
+	@Override
+	public MemorySizeInfo getIndexSizeInBytes() {
+		return new MemorySizeInfo();
+	}
+
+	@Override
+	public long getUniqueValuesSizeInBytes() {
+		return 0;
+	}
+
+	@Override
+	public int getUniqueValuesSize() {
+		return -1;
+	}
+
+	public Histogram getHistogram() {
+		return histogram;
+	}
+
+	@Override
+	public char[] getUniqueCharacters() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String[] getUniqueNGrams(int n) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean hasMaxUniqueValues() {
+		return false;
+	}
+
+	@Override
+	public long getTimeProcessed() {
+		return totalTimeProcessed/1000000;
+	}
+
+}
