@@ -16,7 +16,6 @@ public class CompressedIntegerColumnTest extends TestCase {
 		IntListImpl column = new IntListImpl();
 		for (int i = 0; i < 1000000; i++) {
 			column.addValue(i);
-//			System.out.println(i);
 			assertEquals(i, column.getValue(i));
 		}
 		

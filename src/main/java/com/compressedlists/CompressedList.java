@@ -14,7 +14,6 @@ public interface CompressedList {
 
 	public int getMaxSize();
 
-
 	public long getSizeInBytes();
 	
 	public Histogram getHistogram();

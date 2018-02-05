@@ -44,7 +44,6 @@ public class IntListImpl implements CompressedIntList {
 
 	@Override
 	public boolean addValue(int value) {
-		
 		lastBuffer.addValue(value);
 		size ++;
 		

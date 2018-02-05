@@ -14,7 +14,7 @@ public class CompressedStringColumnTest extends TestCase {
 
 	public void testAddValue() {
 		CompressLivStringListImpl column = new CompressLivStringListImpl();
-		int numRows = 1000;
+		int numRows = 100000;
 		for(int i=0; i<numRows ; i++) {
 			column.addValue("Test " + i);
 			assertEquals("Failed at row "  + i, i+1, column.getSize());
