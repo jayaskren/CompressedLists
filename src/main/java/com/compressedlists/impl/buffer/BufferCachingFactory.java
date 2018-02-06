@@ -24,7 +24,7 @@ public class BufferCachingFactory {
 		return buffer;
 	}
 	
-	public IIntMemoryBuffer tradeForNewBuffer(int numBits, IIntMemoryBuffer bufferToCopy) {
+	public IIntMemoryBuffer tradeForNewBufferAndCopy(int numBits, IIntMemoryBuffer bufferToCopy) {
 		IIntMemoryBuffer buffer = getNewBuffer(numBits);
 		copyBuffer(bufferToCopy, buffer);
 		returnBuffer(bufferToCopy.getNumBits(), bufferToCopy);

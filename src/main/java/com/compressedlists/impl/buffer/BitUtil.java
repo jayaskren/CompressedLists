@@ -70,6 +70,7 @@ public class BitUtil {
 	}
 	
 	// The following are different ways to calculate logarithm base 2
+	@Deprecated
 	public static int logSlow(int x) {
 	    return (int) (Math.log(x) / Math.log(2));
 	}

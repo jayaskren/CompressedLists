@@ -1,7 +1,10 @@
 package com.compressedlists.impl.buffer;
 
+import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer1;
 import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer16;
+import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer2;
 import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer32;
+import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer4;
 import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer8;
 import com.compressedlists.impl.buffer.integer.bitset.BitSetMemoryBuffer1;
 import com.compressedlists.impl.buffer.integer.bitset.BitSetMemoryBuffer2;
@@ -25,11 +28,11 @@ public class BufferFactoryTest extends TestCase {
 	public void testCreateArrayBufferTypeInt() {
 		ArrayBufferFactory factory = new ArrayBufferFactory();
 		IMemoryBuffer buffer1 = factory.createBuffer(0);
-		assertEquals(BitSetMemoryBuffer1.class, buffer1.getClass());
+		assertEquals(UnsignedIntArrayBuffer1.class, buffer1.getClass());
 		IMemoryBuffer buffer2 = factory.createBuffer(1);
-		assertEquals(BitSetMemoryBuffer2.class, buffer2.getClass());
+		assertEquals(UnsignedIntArrayBuffer2.class, buffer2.getClass());
 		IMemoryBuffer buffer4 = factory.createBuffer(2);
-		assertEquals(BitSetMemoryBuffer4.class, buffer4.getClass());
+		assertEquals(UnsignedIntArrayBuffer4.class, buffer4.getClass());
 		IMemoryBuffer buffer8 = factory.createBuffer(3);
 		assertEquals(UnsignedIntArrayBuffer8.class, buffer8.getClass());
 		IMemoryBuffer buffer16 = factory.createBuffer(4);

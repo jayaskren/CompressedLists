@@ -43,21 +43,20 @@ public class TextListImpl extends AbstractDictionaryStringList {
 		lastBufferSize++;
 	}
 
-	private IIntMemoryBuffer createAndCopyBuffer(int logNumBits) {
+	protected IIntMemoryBuffer createAndCopyBuffer(int logNumBits) {
 		IIntMemoryBuffer buffer;
 		// Go to next bigger bit size.  Copy values from current buffer
 		// to new array.  Set indexes appropriately
 		currentNumBits = Math.max(logNumBits, currentNumBits);
 		IIntMemoryBuffer oldBuffer = indexList.remove(indexList.size()-1);
-		buffer = factory.tradeForNewBuffer(currentNumBits, oldBuffer);
-		factory.copyBuffer(oldBuffer, buffer);
+		buffer = factory.tradeForNewBufferAndCopy(currentNumBits, oldBuffer);
 		indexList.add(buffer);
 		lastBufferIndex = indexList.size() - 1;
 		lastBufferSize = buffer.getSize();
 		return buffer;
 	}
 
-	private IIntMemoryBuffer createNewBuffer(int logNumBits) {
+	protected IIntMemoryBuffer createNewBuffer(int logNumBits) {
 		IIntMemoryBuffer buffer;
 		currentNumBits = Math.max(logNumBits, currentNumBits);
 		buffer = factory.getNewBuffer(currentNumBits);

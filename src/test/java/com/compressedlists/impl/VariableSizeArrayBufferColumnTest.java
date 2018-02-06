@@ -29,7 +29,7 @@ public class VariableSizeArrayBufferColumnTest extends TestCase {
 			if(i >= Math.pow(2, 16) - 1) {
 				assertEquals("Error when i = " + i, "[Other]", column.getValue(i));
 			} else {
-				assertEquals("Test " + Integer.toString(i), column.getValue(i));
+				assertEquals("Error when i = " + i, "Test " + Integer.toString(i), column.getValue(i));
 			}
 		}
 		column  = new TextListImpl();
