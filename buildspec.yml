@@ -1,0 +1,9 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - ./gradle clean build
+artifacts:
+  files:
+    - build/libs/compressed-lists.jar
