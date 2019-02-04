@@ -1,16 +1,9 @@
 package com.compressedlists.impl.buffer.text;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
-public class UncompressedStringBufferTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+public class UncompressedStringBufferTest {
 
 	public void testAddValue() {
 		UncompressedStringBuffer buffer = new UncompressedStringBuffer();

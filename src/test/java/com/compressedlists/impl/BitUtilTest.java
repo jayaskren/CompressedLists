@@ -4,17 +4,10 @@ import com.compressedlists.impl.buffer.BitUtil;
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 import com.compressedlists.impl.buffer.IStringArrayBuffer;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class BitUtilTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+public class BitUtilTest {
 
 //	public void testClearBits() {
 //		int begin = 0b11111111;
@@ -157,12 +150,13 @@ public class BitUtilTest extends TestCase {
 ////		assertEquals(-86, (int)packedByte);
 //	}
 	
+	@Test
 	public void testPackUnpackByte() {
 		byte packedByte = (byte) 0;
 //		assertEquals(128, BitUtil.packByteUnsigned(128));
 		for (int i=0; i<256 ; i++) {
 			packedByte = BitUtil.packByteUnsigned(i);
-			assertEquals("Error when: i=" + i, i, BitUtil.unpackByteUnsigned(packedByte));
+			assertEquals(i, BitUtil.unpackByteUnsigned(packedByte), "Error when: i=" + i);
 		}
 	}
 	
@@ -184,6 +178,7 @@ public class BitUtilTest extends TestCase {
 //		assertEquals(8, BitUtil.numBits(128));
 //	}
 	
+	@Test
 	public void testDivide() {
 		for (int i=0; i <256 ;i++){
 			int val = i * IIntMemoryBuffer.BUFFER_SIZE +i;
@@ -191,6 +186,7 @@ public class BitUtilTest extends TestCase {
 		}
 	}
 	
+	@Test
 	public void testModulo() {
 		for (int i=0; i <256 ;i++){
 			int val = i* IIntMemoryBuffer.BUFFER_SIZE +i;
@@ -198,10 +194,11 @@ public class BitUtilTest extends TestCase {
 		}
 	}
 	
+	@Test
 	public void testNumBitsBinLog() {
 		for (int i=2; i<100000; i++) {
 //			System.out.println(i + ": " +(BitUtil.binlog(BitUtil.binlog(i)) + 1) + " =? "  + BitUtil.numBits(i));
-			assertEquals("Not Equal for i = "+i, BitUtil.binlog(BitUtil.binlog(i)) + 1, BitUtil.numBits(i));
+			assertEquals(BitUtil.binlog(BitUtil.binlog(i)) + 1, BitUtil.numBits(i), "Not Equal for i = "+i);
 		}
 	}
 }

@@ -1,17 +1,11 @@
 package com.compressedlists.impl.buffer.text;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
-public class CompressedStringBufferTest extends TestCase {
+public class CompressedStringBufferTest {
 
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	@Test
 	public void testStringToBytesUTFCustom() {
 		String test = "Here is my test";
 		byte[] bytes = CompressedStringBuffer.stringToBytesUTFCustom(test);
@@ -22,6 +16,7 @@ public class CompressedStringBufferTest extends TestCase {
 		assertEquals("is my test", finalString);
 	}
 	
+	@Test
 	public void testStringsToBytes() {
 		String[] text = new String[2];
 		for(int i=0; i < text.length; i++) {

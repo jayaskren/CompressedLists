@@ -2,10 +2,11 @@ package com.compressedlists.impl.buffer.integer.unsafe;
 
 import java.lang.reflect.Field;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 import sun.misc.Unsafe;
 
-public class UnsafeTest extends TestCase {
+public class UnsafeTest {
 
 @SuppressWarnings("restriction")
 private static final Unsafe unsafe;
@@ -20,14 +21,7 @@ private static final Unsafe unsafe;
         }
     }
 	
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-	
+	@Test
 	public void testUnsafe() {
 		int[] data = new int[1024];
 		int numBytesPerRow = 4;
@@ -35,13 +29,13 @@ private static final Unsafe unsafe;
 		
 		for (int i=0; i< data.length ; i++) {
 			unsafe.putInt(data, address + i * numBytesPerRow, i);
-			assertEquals("Failed when i = " + i, i, unsafe.getInt(data, address + (i)*numBytesPerRow));
-			assertEquals("Failed when i = " + i, i, data[i]);
+			assertEquals(i, unsafe.getInt(data, address + (i)*numBytesPerRow), "Failed when i = " + i);
+			assertEquals(i, data[i], "Failed when i = " + i);
 		}
 		
 		for (int i=0; i< data.length ; i++) {
-			assertEquals("Failed when i = " + i, i, unsafe.getInt(data, address + (i)*numBytesPerRow));
-			assertEquals("Failed when i = " + i, i, data[i]);
+			assertEquals(i, unsafe.getInt(data, address + (i)*numBytesPerRow), "Failed when i = " + i);
+			assertEquals(i, data[i], "Failed when i = " + i);
 		}
 	}
 

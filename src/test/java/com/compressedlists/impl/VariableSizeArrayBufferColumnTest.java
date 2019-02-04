@@ -2,17 +2,12 @@ package com.compressedlists.impl;
 
 import java.util.Random;
 
-import junit.framework.TestCase;
-public class VariableSizeArrayBufferColumnTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
+public class VariableSizeArrayBufferColumnTest {
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	@Test
 	public void testAddValue() {
 		System.out.println(Math.pow(2, 16));
 		TextListImpl column = new TextListImpl();
@@ -27,9 +22,9 @@ public class VariableSizeArrayBufferColumnTest extends TestCase {
 		
 		for (int i=0; i<numValuesToAdd; i++) {
 			if(i >= Math.pow(2, 16) - 1) {
-				assertEquals("Error when i = " + i, "[Other]", column.getValue(i));
+				assertEquals("[Other]", column.getValue(i), "Error when i = " + i);
 			} else {
-				assertEquals("Error when i = " + i, "Test " + Integer.toString(i), column.getValue(i));
+				assertEquals("Test " + Integer.toString(i), column.getValue(i), "Error when i = " + i);
 			}
 		}
 		column  = new TextListImpl();
@@ -42,7 +37,7 @@ public class VariableSizeArrayBufferColumnTest extends TestCase {
 		
 		for (int i=0; i<column.getMaxUniqueValues()-1; i++) {
 			for (int j=0; j < 10; j++) {
-				assertEquals("Error at "+i + ", " + j, "Test " + Integer.toString(i) , column.getValue(i*10+j));
+				assertEquals("Test " + Integer.toString(i) , column.getValue(i*10+j), "Error at "+i + ", " + j);
 			}
 		}
 		
@@ -51,7 +46,7 @@ public class VariableSizeArrayBufferColumnTest extends TestCase {
 		for (int i=0; i< 500000; i++) {
 			boolean val = true;//i%2 == 1;
 			column.addValue(Boolean.toString(val));
-			assertEquals("Error at row " + i ,Boolean.toString(val), column.getValue(i));
+			assertEquals(Boolean.toString(val), column.getValue(i), "Error at row " + i );
 		}
 		
 		column  = new TextListImpl();
@@ -59,10 +54,11 @@ public class VariableSizeArrayBufferColumnTest extends TestCase {
 		for (int i=0; i< 500000; i++) {
 			boolean val = i%2 == 1;
 			column.addValue(Boolean.toString(val));
-			assertEquals("Error at row " + i ,Boolean.toString(val), column.getValue(i));
+			assertEquals(Boolean.toString(val), column.getValue(i), "Error at row " + i );
 		}
 	}
 	
+	@Test
 	public void testReuseBuffers() {
 		TextListImpl column100000 = new TextListImpl();
 		TextListImpl column256 = new TextListImpl();

@@ -4,21 +4,15 @@ import java.util.Random;
 
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
-public abstract class AbstractBufferTest extends TestCase {
+public abstract class AbstractBufferTest {
 
 	int[] data;
 	
-	public AbstractBufferTest() {
-		super();
-	}
-
-	public AbstractBufferTest(String name) {
-		super(name);
-	}
-	
-	@Override
+	@BeforeEach 
 	protected void setUp() throws Exception {
 		data = new int[IIntMemoryBuffer.BUFFER_SIZE];
 		Random rand = new Random();
@@ -28,6 +22,7 @@ public abstract class AbstractBufferTest extends TestCase {
 		
 	}
 	
+	@Test
 	public void testAdd() {
 		IIntMemoryBuffer buffer = newBuffer();
 		for(int i=0; i< 100; i++) {

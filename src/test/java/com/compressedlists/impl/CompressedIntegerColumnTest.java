@@ -1,17 +1,11 @@
 package com.compressedlists.impl;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
-public class CompressedIntegerColumnTest extends TestCase {
+public class CompressedIntegerColumnTest {
 
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	@Test
 	public void testAddValue() {
 		IntListImpl column = new IntListImpl();
 		for (int i = 0; i < 1000000; i++) {

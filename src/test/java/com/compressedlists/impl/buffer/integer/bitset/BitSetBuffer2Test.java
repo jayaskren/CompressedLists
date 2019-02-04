@@ -3,6 +3,8 @@ package com.compressedlists.impl.buffer.integer.bitset;
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 import com.compressedlists.impl.buffer.integer.AbstractBufferTest;
 import com.compressedlists.impl.buffer.integer.bitset.BitSetMemoryBuffer2;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class BitSetBuffer2Test extends AbstractBufferTest {
 

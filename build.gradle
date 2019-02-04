@@ -7,13 +7,87 @@
  */
 
 // Apply the java-library plugin to add support for Java Library
-apply plugin: 'java-library'
 
-// In this section you declare where to find the dependencies of your project
-repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
+buildscript {
+  repositories {
     jcenter()
+  }
+}
+
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: "jacoco"
+
+version = '0.0.1'
+sourceCompatibility = 1.8
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+jacocoTestCoverageVerification {
+  violationRules {
+
+//      rule {
+//          element = 'METHOD'
+//          limit {
+//              counter = 'LINE'
+//              value = 'COVEREDRATIO'
+//              minimum = 1.0
+//          }
+//          excludes = [
+//                  'io.reflectoring.coverage.part.PartlyCovered.partlyCovered(java.lang.String, boolean)',
+//          ]
+//      }
+
+    rule {
+      element = 'CLASS'
+      limit {
+        counter = 'LINE'
+        value = 'COVEREDRATIO'
+        minimum = 1.0
+      }
+      excludes = [
+          'io.reflectoring.coverage.part.PartlyCovered',
+          'io.reflectoring.coverage.ignored.*',
+          'io.reflectoring.coverage.part.NotCovered'
+      ]
+    }
+    rule {
+      element = 'CLASS'
+      includes = [
+          'io.reflectoring.coverage.part.PartlyCovered'
+      ]
+      limit {
+        counter = 'LINE'
+        value = 'COVEREDRATIO'
+        minimum = 0.8
+      }
+    }
+  }
+
+}
+
+jacoco {
+    toolVersion = '0.8.2'
+}
+
+test.finalizedBy jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification
+
+test {
+  useJUnitPlatform()
 }
 
 dependencies {
@@ -31,8 +105,9 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     //implementation: 'com.google.guava:guava:21.0', 
 
+    testCompile ('org.junit.jupiter:junit-jupiter-engine:5.0.1', 'org.assertj:assertj-core:2.6.0')
 
     // Use JUnit test framework
-    testImplementation ('junit:junit:4.12')
+    testImplementation ('org.junit.jupiter:junit-jupiter-engine:5.0.1', 'org.jacoco:jacoco-maven-plugin:0.8.2')
 }
 

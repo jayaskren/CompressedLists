@@ -13,17 +13,10 @@ import com.compressedlists.impl.buffer.integer.unsafe.SignedUnsafeBuffer32;
 import com.compressedlists.impl.buffer.integer.unsafe.UnsignedUnsafeBuffer16;
 import com.compressedlists.impl.buffer.integer.unsafe.UnsignedUnsafeBuffer8;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class BufferFactoryTest extends TestCase {
-
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
+public class BufferFactoryTest {
 
 	public void testCreateArrayBufferTypeInt() {
 		ArrayBufferFactory factory = new ArrayBufferFactory();
