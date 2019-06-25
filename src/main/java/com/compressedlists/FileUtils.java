@@ -1,4 +1,4 @@
-package com.compressedlists.impl.io;
+package com.compressedlists;
 
 import java.io.File;
 import java.io.FileReader;
@@ -6,11 +6,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Properties;
 
-import com.compressedlists.CompressedList;
-import com.compressedlists.DataTable;
-import com.compressedlists.DataType;
-import com.compressedlists.StringList;
-import com.compressedlists.TextList;
 import com.compressedlists.impl.IntListImpl;
 import com.compressedlists.impl.StringListImpl;
 import com.compressedlists.impl.TextListImpl;
