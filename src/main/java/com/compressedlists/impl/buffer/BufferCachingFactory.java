@@ -26,16 +26,16 @@ public class BufferCachingFactory {
 	
 	public IIntMemoryBuffer tradeForNewBufferAndCopy(int numBits, IIntMemoryBuffer bufferToCopy) {
 		IIntMemoryBuffer buffer = getNewBuffer(numBits);
-		copyBuffer(bufferToCopy, buffer);
+		buffer.copy(bufferToCopy);
 		returnBuffer(bufferToCopy.getNumBits(), bufferToCopy);
 		return buffer;
 	}
 	
-	public void copyBuffer(IIntMemoryBuffer oldBuffer, IIntMemoryBuffer newBuffer) {
-		for(int i=0; i<oldBuffer.getSize(); i++) {
-			newBuffer.addValue(oldBuffer.getValue(i));
-		}
-	}
+//	public void copyBuffer(IIntMemoryBuffer oldBuffer, IIntMemoryBuffer newBuffer) {
+//		for(int i=0; i<oldBuffer.getSize(); i++) {
+//			newBuffer.addValue(oldBuffer.getValue(i));
+//		}
+//	}
 	
 	public void returnBuffer(int numBits, IIntMemoryBuffer bufferToCopy) {
 		buffers[numBits].offer(bufferToCopy);

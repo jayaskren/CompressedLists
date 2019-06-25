@@ -2,7 +2,7 @@ package com.compressedlists;
 
 import java.util.List;
 
-public interface DictionaryCompressedStringList extends CompressedStringList {
+public interface StringList extends TextList {
 
 	int getUniqueValuesSize();
 	List<String> getUniqueValues();

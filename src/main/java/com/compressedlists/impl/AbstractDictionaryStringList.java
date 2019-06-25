@@ -7,7 +7,7 @@ import java.util.List;
 import org.HdrHistogram.Histogram;
 
 import com.compressedlists.DataType;
-import com.compressedlists.DictionaryCompressedStringList;
+import com.compressedlists.StringList;
 
 //import com.gs.collections.api.map.MutableMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -15,7 +15,7 @@ import it.unimi.dsi.fastutil.objects.Object2CharOpenHashMap;
 //import com.gs.collections.impl.map.mutable.UnifiedMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
-public abstract class AbstractDictionaryStringList implements DictionaryCompressedStringList {
+public abstract class AbstractDictionaryStringList implements StringList {
 	protected final int maxUniqueValues = (int) Math.pow(2,16)-1;
 	protected final int maxSize = Integer.MAX_VALUE;
 //	Histogram histogram = new Histogram(3600000000000L, 3);
@@ -26,7 +26,7 @@ public abstract class AbstractDictionaryStringList implements DictionaryCompress
 	protected int size;
 	protected long uniqueValuesNumChars = 0l;
 	long totalTimeProcessed = 0l;
-	
+	long originalSize = 0l;
 	public AbstractDictionaryStringList () {
 		uniqueValuesMap = new Object2CharOpenHashMap<String>();
 		count = new IntArrayList();
@@ -60,6 +60,7 @@ public abstract class AbstractDictionaryStringList implements DictionaryCompress
 		
 		long timeProcessed = System.nanoTime() - begin;
 		totalTimeProcessed += timeProcessed;
+		originalSize+=val.length(); // 1 byte per character for UTF-8
 //		histogram.recordValue(timeProcessed);
 	}
 	
@@ -122,6 +123,10 @@ public abstract class AbstractDictionaryStringList implements DictionaryCompress
 	@Override
 	public long getTimeProcessed() {
 		return totalTimeProcessed/1000000;
+	}
+	
+	public long getOriginalSizeInBytes() {
+		return originalSize;
 	}
 }
 

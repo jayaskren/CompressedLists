@@ -51,4 +51,12 @@ public class UnsignedIntArrayBuffer32 implements IIntMemoryBuffer {
 	public void reset() {
 		size = 0;
 	}
+
+	@Override
+	public void copy(IIntMemoryBuffer other) {
+		this.size = other.getSize();
+		for (int i=0; i < this.size; i++) {
+			data[i] = other.getValue(i);
+		}
+	}
 }

@@ -8,12 +8,22 @@ public class CompressedIntegerBuffer implements IMemoryBuffer {
 	private int size;
 	public final int[] compressedData;
 	private int uncompressedByteSize = 0;
+	private int min;
+	private int max;
 	
 	public CompressedIntegerBuffer(int[] values) {
 		size = values.length;
 		
 		uncompressedByteSize = values.length * 4;
 		compressedData = IntegerCompressor.getInstance().compress(values);
+	}
+
+	public int getMin() {
+		return min;
+	}
+
+	public int getMax() {
+		return max;
 	}
 
 	@Override
@@ -40,6 +50,6 @@ public class CompressedIntegerBuffer implements IMemoryBuffer {
 	public UncompressedIntegerBuffer uncompress() {
 		int[] data = new int[IIntMemoryBuffer.BUFFER_SIZE];
 		IntegerCompressor.getInstance().uncompress(compressedData, data);
-		return new UncompressedIntegerBuffer(data);
+		return new UncompressedIntegerBuffer(data, min, max);
 	}
 }

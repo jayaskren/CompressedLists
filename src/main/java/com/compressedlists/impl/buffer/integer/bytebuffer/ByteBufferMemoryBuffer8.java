@@ -45,7 +45,7 @@ public class ByteBufferMemoryBuffer8 implements IIntMemoryBuffer {
 
 	@Override
 	public int getValue(int pos) {
-		return buffer.getInt(pos);
+		return buffer.get(pos);
 	}
 
 	@Override
@@ -57,6 +57,14 @@ public class ByteBufferMemoryBuffer8 implements IIntMemoryBuffer {
 	public void reset() {
 		buffer.clear();
 		size = 0;
+	}
+
+	@Override
+	public void copy(IIntMemoryBuffer other) {
+		int size = other.getSize();
+		for (int i=0; i < size ; i++) {
+			buffer.put(i, (byte)other.getValue(i));
+		}
 	}
 
 }

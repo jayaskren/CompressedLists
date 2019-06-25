@@ -10,7 +10,7 @@ public class VariableSizeArrayBufferColumnTest {
 	@Test
 	public void testAddValue() {
 		System.out.println(Math.pow(2, 16));
-		TextListImpl column = new TextListImpl();
+		StringListImpl column = new StringListImpl();
 		
 		int numValuesToAdd = 100000;
 		for (int i=0; i < numValuesToAdd; i++) {
@@ -27,7 +27,7 @@ public class VariableSizeArrayBufferColumnTest {
 				assertEquals("Test " + Integer.toString(i), column.getValue(i), "Error when i = " + i);
 			}
 		}
-		column  = new TextListImpl();
+		column  = new StringListImpl();
 		
 		for (int i=0; i < numValuesToAdd; i++) {
 			for (int j=0; j < 10; j++) {
@@ -41,7 +41,7 @@ public class VariableSizeArrayBufferColumnTest {
 			}
 		}
 		
-		column  = new TextListImpl();
+		column  = new StringListImpl();
 		Random rand = new Random();
 		for (int i=0; i< 500000; i++) {
 			boolean val = true;//i%2 == 1;
@@ -49,7 +49,7 @@ public class VariableSizeArrayBufferColumnTest {
 			assertEquals(Boolean.toString(val), column.getValue(i), "Error at row " + i );
 		}
 		
-		column  = new TextListImpl();
+		column  = new StringListImpl();
 		rand = new Random();
 		for (int i=0; i< 500000; i++) {
 			boolean val = i%2 == 1;
@@ -60,9 +60,9 @@ public class VariableSizeArrayBufferColumnTest {
 	
 	@Test
 	public void testReuseBuffers() {
-		TextListImpl column100000 = new TextListImpl();
-		TextListImpl column256 = new TextListImpl();
-		TextListImpl column16 = new TextListImpl();
+		StringListImpl column100000 = new StringListImpl();
+		StringListImpl column256 = new StringListImpl();
+		StringListImpl column16 = new StringListImpl();
 		
 		
 		int numValuesToAdd = 500000;

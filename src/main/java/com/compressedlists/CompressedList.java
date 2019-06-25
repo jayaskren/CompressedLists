@@ -21,5 +21,7 @@ public interface CompressedList {
 	public boolean hasMaxUniqueValues();
 	
 	public long getTimeProcessed();
+	
+	public long getOriginalSizeInBytes();
 
 }

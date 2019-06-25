@@ -7,7 +7,7 @@ public class CompressedStringColumnTest {
 
 	@Test
 	public void testAddValue() {
-		CompressLivStringListImpl column = new CompressLivStringListImpl();
+		TextListImpl column = new TextListImpl();
 		int numRows = 100000;
 		for(int i=0; i<numRows ; i++) {
 			column.addValue("Test " + i);

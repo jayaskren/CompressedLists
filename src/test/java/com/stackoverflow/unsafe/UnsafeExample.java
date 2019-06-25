@@ -1,17 +1,10 @@
 package com.stackoverflow.unsafe;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class UnsafeExample extends TestCase {
+public class UnsafeExample {
 
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	@Test
 	public void testUnsafe() {
 		
 	}

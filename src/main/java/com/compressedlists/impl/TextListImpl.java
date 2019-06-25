@@ -3,105 +3,152 @@ package com.compressedlists.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.compressedlists.impl.buffer.BitUtil;
-import com.compressedlists.impl.buffer.BufferCachingFactory;
-import com.compressedlists.impl.buffer.BufferType;
-import com.compressedlists.impl.buffer.IIntMemoryBuffer;
-import com.compressedlists.impl.buffer.IMemoryBuffer;
-import com.compressedlists.impl.buffer.MemorySizeInfo;
+import org.HdrHistogram.Histogram;
 
-public class TextListImpl extends AbstractDictionaryStringList {
-	protected final BufferCachingFactory factory;
-	protected final BufferType bufferType = BufferType.Array;
-	protected final List<IIntMemoryBuffer> indexList;
-	protected int currentNumBits = 0;
-	protected int lastBufferIndex;
-	protected int lastBufferSize;
-	protected IIntMemoryBuffer lastMemoryBuffer;
+import com.compressedlists.impl.buffer.IStringArrayBuffer;
+import com.compressedlists.impl.buffer.MemorySizeInfo;
+import com.compressedlists.impl.buffer.text.CompressedStringBuffer;
+import com.compressedlists.impl.buffer.text.UncompressedStringBuffer;
+import com.compressedlists.TextList;
+import com.compressedlists.DataType;
+
+public class TextListImpl implements TextList {
+
+	Histogram histogram = null; //new Histogram(3600000000000L, 3);
+	private List<CompressedStringBuffer> buffers;
+	private int size = 0;
+	private long sizeInBytes = 0;
+	private UncompressedStringBuffer lastStringBuffer;
+	private UncompressedStringBuffer retrievedStringBuffer;
+	private int retrievedBufferNum = -1;
+	long totalTimeProcessed = 0l;
+	long originalSize = 0l;
+	
+	public TextListImpl(TextList column) {
+		this();
+		
+		for(int i=0; i<column.getSize(); i++) {
+			addValue(column.getValue(i));
+		}
+		lastStringBuffer = new UncompressedStringBuffer();
+		retrievedStringBuffer = new UncompressedStringBuffer();
+		if (column.getHistogram() != null) {
+			this.histogram = column.getHistogram().copy();
+		}
+	}
 	
 	public TextListImpl() {
-		super();
-		indexList = new ArrayList<IIntMemoryBuffer>();
-		factory = new BufferCachingFactory();
-		lastMemoryBuffer = createNewBuffer(0);
-		
+		buffers = new ArrayList<>();
+		lastStringBuffer = new UncompressedStringBuffer();
+		retrievedStringBuffer = new UncompressedStringBuffer();
 	}
 	
-	protected void addIndex(int index) {
-		int logNumBits;
-		
-		logNumBits = BitUtil.numBits(index);
-		
-		if (lastBufferSize >=  IIntMemoryBuffer.BUFFER_SIZE) { 
-			// We need a new buffer. Create new one and set indexes appropriately
-			lastMemoryBuffer = createNewBuffer(logNumBits);	
-		} else if (logNumBits > currentNumBits) {
-			lastMemoryBuffer = createAndCopyBuffer(logNumBits);
-		} 
-
-		lastMemoryBuffer.addValue(index);
-		lastBufferSize++;
-	}
-
-	protected IIntMemoryBuffer createAndCopyBuffer(int logNumBits) {
-		IIntMemoryBuffer buffer;
-		// Go to next bigger bit size.  Copy values from current buffer
-		// to new array.  Set indexes appropriately
-		currentNumBits = Math.max(logNumBits, currentNumBits);
-		IIntMemoryBuffer oldBuffer = indexList.remove(indexList.size()-1);
-		buffer = factory.tradeForNewBufferAndCopy(currentNumBits, oldBuffer);
-		indexList.add(buffer);
-		lastBufferIndex = indexList.size() - 1;
-		lastBufferSize = buffer.getSize();
-		return buffer;
-	}
-
-	protected IIntMemoryBuffer createNewBuffer(int logNumBits) {
-		IIntMemoryBuffer buffer;
-		currentNumBits = Math.max(logNumBits, currentNumBits);
-		buffer = factory.getNewBuffer(currentNumBits);
-		indexList.add(buffer);
-		lastBufferIndex = indexList.size() - 1;
-		lastBufferSize = 0;
-		return buffer;
+	@Override
+	public void addValue(String str) {
+		long begin = System.nanoTime();
+		lastStringBuffer.addValue(str);
+		size ++;
+//		System.out.println(size);
+		if (lastStringBuffer.getSize() == lastStringBuffer.BUFFER_SIZE) {
+			// TODO what is this all zeroes doing.  I think this was debugging?
+//			boolean allZeroes = true;
+//			for (int i=0; i < 10 ; i++) {
+//				if (lastStringBuffer.getValue(i) != "0"){
+//					allZeroes = false;
+//				}
+//			}
+//			if(allZeroes) {
+//				System.out.println("Error Adding " + str + " Found all Zeroes");
+//			}
+			CompressedStringBuffer buffer = lastStringBuffer.compressToBuffer();
+			buffers.add(buffer);
+			sizeInBytes += buffer.getSizeInBytes();
+			lastStringBuffer = new UncompressedStringBuffer();
+		}
+		long timeProcessed = System.nanoTime() - begin;
+		totalTimeProcessed += timeProcessed;
+		if (histogram != null) {
+			histogram.recordValue(timeProcessed);
+		}
+		originalSize+=str.length();
 	}
 	
-	int getIndexValue(List<byte[]> currentList, int index, int bitIndex, int listIndex) {
-		byte[] currentArray = currentList.get(listIndex);
-		return currentArray[bitIndex];
-	}
-	
+	@Override
 	public void setValue(int i, String val) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public int getIndexValue(int i) {
-		int bufferIndex = i >> IIntMemoryBuffer.NUM_BITS;
-		int bitIndex = i & IIntMemoryBuffer.BUFFER_SIZE_MODULO_MASK; 
+	public String getValue(int i) {
+		int bufferNum = i >> IStringArrayBuffer.NUM_BITS; // Divide by BUFFER_SIZE
+		int index = i & IStringArrayBuffer.BUFFER_SIZE_MODULO_MASK; // Modulo BUFFER_SIZE
 		
-		return indexList.get(bufferIndex).getValue(bitIndex);
-	}
-
-	@Override
-	public MemorySizeInfo getIndexSizeInBytes() {
-		long sizeInBytes = 0;
-		long waistedSizeInBytes = 0;
-		for(IMemoryBuffer buffer : indexList) {
-			sizeInBytes += buffer.getSizeInBytes();
-			waistedSizeInBytes += buffer.getWaistedSizeInBytes();
+		if (bufferNum == buffers.size()) {
+			// last buffer
+			return this.lastStringBuffer.getValue(index);
+		} else if (bufferNum == this.retrievedBufferNum) {
+//			if (index >= retrievedStringBuffer.getSize()) {
+//				System.out.println("Error at index " + index);
+//			}
+			return this.retrievedStringBuffer.getValue(index);
+		} else {
+			retrievedBufferNum = bufferNum;
+			this.buffers.get(bufferNum).uncompressToBuffer(retrievedStringBuffer);
+			return this.retrievedStringBuffer.getValue(index);
 		}
-		MemorySizeInfo info = new MemorySizeInfo();
-		info.sizeInBytes = sizeInBytes;
-		info.waistedSizeInBytes = waistedSizeInBytes;
-		return info;
+		
+//		CompressedStringBuffer buffer = buffers.get(bufferNum);
+		
+//		if (i < buffer.compressedData.length ) {
+//			return String.valueOf(buffer.compressedData[i]);
+//		} else {
+//			return "NAN";
+//		}
+	}
+	
+	@Override
+	public DataType getDataType() {
+		return DataType.TEXT;
+	}
+
+	@Override
+	public int getSize() {
+		return size;
+	}
+
+	@Override
+	public String getValueDisplay(int i) {
+		return getValue(i);
+	}
+
+	@Override
+	public int getMaxSize() {
+		return Integer.MAX_VALUE;
 	}
 
 	@Override
 	public long getSizeInBytes() {
-		// TODO Auto-generated method stub
+		return sizeInBytes;
+	}
+
+	@Override
+	public MemorySizeInfo getIndexSizeInBytes() {
+		return new MemorySizeInfo();
+	}
+
+	@Override
+	public long getUniqueValuesSizeInBytes() {
 		return 0;
+	}
+
+	@Override
+	public int getUniqueValuesSize() {
+		return -1;
+	}
+
+	public Histogram getHistogram() {
+		return histogram;
 	}
 
 	@Override
@@ -115,6 +162,21 @@ public class TextListImpl extends AbstractDictionaryStringList {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
+	@Override
+	public boolean hasMaxUniqueValues() {
+		return false;
+	}
+
+	@Override
+	public long getTimeProcessed() {
+		return totalTimeProcessed/1000000;
+	}
+
+	@Override
+	public long getOriginalSizeInBytes() {
+		// TODO Auto-generated method stub
+		return originalSize;
+	}
+
 }

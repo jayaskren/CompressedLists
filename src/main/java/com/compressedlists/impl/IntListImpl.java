@@ -9,10 +9,10 @@ import com.compressedlists.impl.buffer.IStringArrayBuffer;
 import com.compressedlists.impl.buffer.integer.CompressedIntegerBuffer;
 import com.compressedlists.impl.buffer.integer.IntegerParser;
 import com.compressedlists.impl.buffer.integer.UncompressedIntegerBuffer;
-import com.compressedlists.CompressedIntList;
+import com.compressedlists.IntList;
 import com.compressedlists.DataType;
 
-public class IntListImpl implements CompressedIntList {
+public class IntListImpl implements IntList {
 
 	List<CompressedIntegerBuffer> buffers;
 	private int size = 0;
@@ -23,7 +23,7 @@ public class IntListImpl implements CompressedIntList {
 	Histogram histogram = null; //new Histogram(3600000000000L, 3);
 	long totalTimeProcessed = 0l;
 	
-	public IntListImpl(CompressedIntList column) {
+	public IntListImpl(IntList column) {
 		this();
 		
 		for(int i=0; i<column.getSize(); i++) {
@@ -54,7 +54,6 @@ public class IntListImpl implements CompressedIntList {
 			sizeInBytes += buffer.getSizeInBytes();
 			lastBuffer = new UncompressedIntegerBuffer();
 		}
-		
 		return true;
 	}
 
@@ -125,13 +124,13 @@ public class IntListImpl implements CompressedIntList {
 	}
 
 	@Override
-	public CompressedIntList add(int val) {
+	public IntList add(int val) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompressedIntList add(CompressedIntList lst) {
+	public IntList add(IntList lst) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -145,6 +144,23 @@ public class IntListImpl implements CompressedIntList {
 	@Override
 	public long getTimeProcessed() {
 		return totalTimeProcessed/1000000;
+	}
+
+	@Override
+	public long getOriginalSizeInBytes() {
+		return getSize()*4;
+	}
+
+	@Override
+	public int getMax() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getMin() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

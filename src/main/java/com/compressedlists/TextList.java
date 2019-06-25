@@ -5,7 +5,7 @@ import org.HdrHistogram.Histogram;
 import com.compressedlists.impl.buffer.MemorySizeInfo;
 
 
-public interface CompressedStringList extends CompressedList {
+public interface TextList extends CompressedList {
 
 	void addValue(String str);
 	void setValue(int i, String val);

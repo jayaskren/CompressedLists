@@ -119,13 +119,23 @@ public class BitSetMemoryBuffer4 implements IIntMemoryBuffer {
 
 	@Override
 	public int getNumBits() {
-		// TODO Auto-generated method stub
 		return 2;
 	}
 	
 	@Override
 	public void reset() {
 		count = 0;
+	}
+
+	@Override
+	public void copy(IIntMemoryBuffer other) {
+		this.count = other.getSize();
+		for (int i=0; i < count; i++) {
+			bitset.set(4*i, (other.getValue(i) & 1) == 1);
+			bitset.set(4*i+1, ((other.getValue(i) >> 1) & 1) == 1);
+			bitset.set(4*i+2, ((other.getValue(i) >> 2) & 1) == 1);
+			bitset.set(4*i+3, ((other.getValue(i) >> 3) & 1) == 1);
+		}
 	}
 
 }

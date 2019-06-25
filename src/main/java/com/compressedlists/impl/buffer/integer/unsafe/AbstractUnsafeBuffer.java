@@ -10,7 +10,7 @@ import sun.misc.Unsafe;
 public abstract class AbstractUnsafeBuffer implements IIntMemoryBuffer {
 	final int numBytesPerRow;
 	
-	private static final Unsafe unsafe;
+	protected static final Unsafe unsafe;
 	
 	static {
         try {

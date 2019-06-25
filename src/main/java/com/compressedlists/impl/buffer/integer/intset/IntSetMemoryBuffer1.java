@@ -1,19 +1,15 @@
-package com.compressedlists.impl.buffer.integer.bitset;
-
-
-import java.util.BitSet;
-
-import org.roaringbitmap.RoaringBitmap;
+package com.compressedlists.impl.buffer.integer.intset;
 
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 
-public class BitSetMemoryBuffer1 implements IIntMemoryBuffer {
+import gnu.trove.set.hash.TIntHashSet;
 
-	private final BitSet bitset;
+public class IntSetMemoryBuffer1 implements IIntMemoryBuffer {
+	private TIntHashSet hashSet;
 	private int count = 0;
 	
-	public BitSetMemoryBuffer1() {
-		bitset = new BitSet(/*BUFFER_SIZE*/);
+	public IntSetMemoryBuffer1() {
+		hashSet = new TIntHashSet(BUFFER_SIZE);
 	}
 	
 	@Override
@@ -33,30 +29,25 @@ public class BitSetMemoryBuffer1 implements IIntMemoryBuffer {
 
 	@Override
 	public void addValue(int value) {
-//		if (value==1) {
-//			bitset.add(count);
-//		} 
+		if (value==1) {
+			hashSet.add(count);
+		} 
 
-		if (value == 1) {
-			bitset.set(count);
-		}
 		count ++;
 	}
 
 	@Override
 	public void setValue(int pos, int value) {
-//		if (value==1) {
-//			bitset.add(pos);
-//		} else { 
-//			bitset.remove(pos);
-//		}
-		
-		bitset.set(pos, value==1);
+		if (value==1) {
+			hashSet.add(pos);
+		} else { 
+			hashSet.remove(pos);
+		}
 	}
 
 	@Override
 	public int getValue(int pos) {
-		boolean val = bitset.get(pos);
+		boolean val = hashSet.contains(pos);
 		
 		int returnVal;
 		if (val) {
@@ -81,8 +72,7 @@ public class BitSetMemoryBuffer1 implements IIntMemoryBuffer {
 	public void copy(IIntMemoryBuffer other) {
 		this.count = other.getSize();
 		for (int i=0; i < count; i++) {
-			bitset.set(i, other.getValue(i)==1);
+			setValue(i, other.getValue(i));
 		}
 	}
-
 }

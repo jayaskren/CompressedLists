@@ -52,4 +52,10 @@ public class MappedFileBuffer16 implements IIntMemoryBuffer {
 		
 	}
 
+	@Override
+	public void copy(IIntMemoryBuffer other) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

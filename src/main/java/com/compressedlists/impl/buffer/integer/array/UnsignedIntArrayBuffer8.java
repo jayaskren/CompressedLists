@@ -53,4 +53,13 @@ public class UnsignedIntArrayBuffer8 implements IIntMemoryBuffer {
 		size = 0;
 	}
 
+	@Override
+	public void copy(IIntMemoryBuffer other) {
+		this.size = other.getSize();
+		for (int i=0; i < this.size; i++) {
+			data[i] = (byte)(0b11111111 & other.getValue(i));
+		}
+	}
+
+	
 }

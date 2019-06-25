@@ -99,4 +99,18 @@ public class BitSetMemoryBuffer2 implements IIntMemoryBuffer {
 		count = 0;
 	}
 
+	@Override
+	public void copy(IIntMemoryBuffer other) {
+		this.count = other.getSize();
+		for (int i=0; i < count; i++) {
+			if ((other.getValue(i) & 1) == 1) {
+				bitset.set(2*i);
+			}
+			
+			if (((other.getValue(i) >> 1) & 1)==1) {
+				bitset.set(2*i+1);
+			}
+		}
+	}
+
 }

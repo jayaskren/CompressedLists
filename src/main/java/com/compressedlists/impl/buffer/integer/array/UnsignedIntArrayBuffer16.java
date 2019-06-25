@@ -50,6 +50,14 @@ public class UnsignedIntArrayBuffer16 implements IIntMemoryBuffer {
 	public void reset() {
 		size = 0;
 	}
+
+	@Override
+	public void copy(IIntMemoryBuffer other) {
+		this.size = other.getSize();
+		for (int i=0; i < this.size; i++) {
+			data[i] = (char)other.getValue(i);
+		}
+	}
 	
 	
 }

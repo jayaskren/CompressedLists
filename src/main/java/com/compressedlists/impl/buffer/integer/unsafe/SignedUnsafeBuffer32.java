@@ -1,5 +1,7 @@
 package com.compressedlists.impl.buffer.integer.unsafe;
 
+import com.compressedlists.impl.buffer.IIntMemoryBuffer;
+
 import sun.misc.Unsafe;
 
 public class SignedUnsafeBuffer32 extends AbstractUnsafeBuffer {
@@ -21,5 +23,13 @@ public class SignedUnsafeBuffer32 extends AbstractUnsafeBuffer {
 	@Override
 	public int getNumBits() {
 		return 5;
+	}
+
+	@Override
+	public void copy(IIntMemoryBuffer other) {
+		this.size=other.getSize();
+		for (int i=0; i<size; i++) {
+			unsafe.putInt(data, address + i * numBytesPerRow, other.getValue(i));
+		}
 	}
 }

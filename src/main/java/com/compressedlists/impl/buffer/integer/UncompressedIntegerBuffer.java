@@ -4,8 +4,10 @@ import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 
 public class UncompressedIntegerBuffer implements IIntMemoryBuffer{
 	protected int[] data;
-	protected int size;
+	protected int size; 
 	private int sizeInBytes = 0;
+	private int min = 0;
+	private int max = 0;
 	
 	public UncompressedIntegerBuffer() {
 		data = new int[BUFFER_SIZE];
@@ -13,10 +15,12 @@ public class UncompressedIntegerBuffer implements IIntMemoryBuffer{
 		sizeInBytes = 0;
 	}
 	
-	public UncompressedIntegerBuffer(int[] data) {
+	public UncompressedIntegerBuffer(int[] data, int min, int max) {
 		this.data = data;
 		this.size = data.length;
 		this.sizeInBytes = data.length * 4;
+		this.min = min;
+		this.max = max;
 	}
 	
 	@Override
@@ -41,12 +45,15 @@ public class UncompressedIntegerBuffer implements IIntMemoryBuffer{
 
 	@Override
 	public void addValue(int value) {
-		if (value == 32767) {
-			System.out.println("Test");
-		}
 		data[size] = value;
 		sizeInBytes += 4;
 		size ++;
+		if (min < value) {
+			min = value;
+		}
+		if (max < value) {
+			max = value;
+		}
 	}
 
 	@Override
@@ -64,8 +71,25 @@ public class UncompressedIntegerBuffer implements IIntMemoryBuffer{
 		return 0;
 	}
 
+	public int getMin() {
+		return min;
+	}
+
+	public int getMax() {
+		return max;
+	}
+
 	public CompressedIntegerBuffer compressToBuffer() {
 		return new CompressedIntegerBuffer(data);
+	}
+
+	@Override
+	public void copy(IIntMemoryBuffer other) {
+		this.size = other.getSize();
+		sizeInBytes = 4 * size;
+		for (int i=0; i< other.getSize(); i++) {
+			data[i] = other.getValue(i);
+		}
 	}
 
 }

@@ -13,9 +13,9 @@ public class ByteBufferMemoryBuffer32 implements IIntMemoryBuffer {
 	public ByteBufferMemoryBuffer32 (boolean useDirect) {
 		ByteBuffer byteBuffer;
 		if (useDirect) {
-			byteBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+			byteBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE*4);
 		} else {
-			byteBuffer = ByteBuffer.allocate(BUFFER_SIZE);
+			byteBuffer = ByteBuffer.allocate(BUFFER_SIZE*4);
 		}
 		buffer = byteBuffer.asIntBuffer();
 	}
@@ -61,6 +61,14 @@ public class ByteBufferMemoryBuffer32 implements IIntMemoryBuffer {
 	public void reset() {
 		buffer.clear();
 		size = 0;
+	}
+
+	@Override
+	public void copy(IIntMemoryBuffer other) {
+		int size = other.getSize();
+		for (int i=0; i < size ; i++) {
+			buffer.put(i, other.getValue(i));
+		}
 	}
 
 }
