@@ -1,21 +1,26 @@
 package com.compressedlists.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.HdrHistogram.Histogram;
 
+import com.compressedlists.impl.buffer.IMemoryBuffer;
 import com.compressedlists.impl.buffer.IStringArrayBuffer;
 import com.compressedlists.impl.buffer.MemorySizeInfo;
 import com.compressedlists.impl.buffer.text.CompressedStringBuffer;
 import com.compressedlists.impl.buffer.text.UncompressedStringBuffer;
 import com.compressedlists.TextList;
+import com.compressedlists.CompressionType;
 import com.compressedlists.DataType;
 
 public class TextListImpl implements TextList {
 
 	Histogram histogram = null; //new Histogram(3600000000000L, 3);
-	private List<CompressedStringBuffer> buffers;
+	List<CompressedStringBuffer> buffers;
 	private int size = 0;
 	private long sizeInBytes = 0;
 	private UncompressedStringBuffer lastStringBuffer;
@@ -179,4 +184,19 @@ public class TextListImpl implements TextList {
 		return originalSize;
 	}
 
+	@Override
+	public int writeData(RandomAccessFile file, CompressionType compression, int bufferIndex) throws IOException {
+		return buffers.get(bufferIndex).writeData(file, compression);
+	}
+
+	@Override
+	public int readData(File folder, CompressionType compression, int bufferIndex, int numBytes, int numRecords) throws IOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	public List<? extends IMemoryBuffer> getBufferList() {
+		return buffers;
+	}
 }

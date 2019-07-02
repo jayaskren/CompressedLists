@@ -75,6 +75,47 @@ public class BitUtil {
 	    return (int) (Math.log(x) / Math.log(2));
 	}
 	
+	public static byte[] charToBytes(char[] data, int length) {
+		byte[] returnBytes = new byte[length*2];
+		
+		for (int i=0; i < length; i++) {
+			returnBytes[i*2] = (byte) (data[i] & 0xFF);
+			returnBytes[i*2 + 1] = (byte) ((data[i] >> 8) & 0xFF);
+		}
+		
+		return returnBytes;
+	}
+	
+	public static char[] bytesToChars(byte[] data, char[] charArray, int length) {
+		for (int i=0; i < length; i++) {
+			charArray[i] = (char) ((data[2*i] & 0xff) | (((data[2*i+1]) & 0xff) << 8));
+		}
+		return charArray;
+	}
+	
+	public static byte[] intToBytes(int[] data, int length) {
+		byte[] returnBytes = new byte[length*4];
+		
+		for (int i=0; i < length; i++) {
+			returnBytes[i*4] = (byte) (data[i] & 0xFF);
+			returnBytes[i*4 + 1] = (byte) ((data[i] >> 8) & 0xFF);
+			returnBytes[i*4 + 2] = (byte) ((data[i] >> 16) & 0xFF);
+			returnBytes[i*4 + 3] = (byte) ((data[i] >> 32) & 0xFF);
+		}
+		
+		return returnBytes;
+	}
+	
+	public static int[] bytesToInts(byte[] data, int[] intArray, int length) {
+		for (int i=0; i < length; i++) {
+			intArray[i] = ((data[4*i] & 0xff) | 
+					(((data[4*i+1]) & 0xff) << 8) | 
+					(((data[4*i+2]) & 0xff) << 16) | 
+					(((data[4*i+3]) & 0xff) << 24));
+		}
+		return intArray;
+	}
+	
 	public static int binlog( int bits ) {// returns 0 for bits=0 
 	    int log = 0;
 	    if( ( bits & 0xffff0000 ) != 0 ) { bits >>>= 16; log = 16; }

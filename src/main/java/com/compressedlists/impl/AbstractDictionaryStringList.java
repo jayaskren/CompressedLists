@@ -109,7 +109,7 @@ public abstract class AbstractDictionaryStringList implements StringList {
 	}
 	
 	public DataType getDataType() {
-		return DataType.TEXT;
+		return DataType.STRING;
 	}
 
 	public int getSize() {

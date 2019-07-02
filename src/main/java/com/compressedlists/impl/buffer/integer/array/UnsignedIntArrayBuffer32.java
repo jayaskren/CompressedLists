@@ -1,5 +1,10 @@
 package com.compressedlists.impl.buffer.integer.array;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
+import com.compressedlists.CompressionType;
+import com.compressedlists.impl.buffer.BitUtil;
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 
 public class UnsignedIntArrayBuffer32 implements IIntMemoryBuffer {
@@ -43,7 +48,7 @@ public class UnsignedIntArrayBuffer32 implements IIntMemoryBuffer {
 	}
 
 	@Override
-	public int getNumBits() {
+	public int getLogOfBitsPerRow() {
 		return 5;
 	}
 	
@@ -58,5 +63,34 @@ public class UnsignedIntArrayBuffer32 implements IIntMemoryBuffer {
 		for (int i=0; i < this.size; i++) {
 			data[i] = other.getValue(i);
 		}
+	}
+
+	@Override
+	public int writeData(RandomAccessFile file, CompressionType compression) throws IOException {
+		byte[] bytes = BitUtil.intToBytes(this.data, this.size);
+		
+		switch (compression) {
+		case GZIP:
+			
+			break;
+		case LZ4:
+			
+			break;
+		case SNAPPY:
+			
+			break;
+		case ZSTD:
+			
+			break;
+		default:
+			file.write(bytes, 0, getSize() * 4);
+			return bytes.length;
+		}
+		return 0;
+	}
+	
+	@Override
+	public void readFromFile(RandomAccessFile file, CompressionType compression, int numRecords, int numBytes) throws IOException {
+		
 	}
 }

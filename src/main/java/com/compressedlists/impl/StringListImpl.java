@@ -1,19 +1,24 @@
 package com.compressedlists.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.compressedlists.CompressionType;
 import com.compressedlists.impl.buffer.BitUtil;
 import com.compressedlists.impl.buffer.BufferCachingFactory;
 import com.compressedlists.impl.buffer.BufferType;
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 import com.compressedlists.impl.buffer.IMemoryBuffer;
 import com.compressedlists.impl.buffer.MemorySizeInfo;
+import com.compressedlists.impl.buffer.integer.intset.IntSetMemoryBuffer1;
 
 public class StringListImpl extends AbstractDictionaryStringList {
 	protected final BufferCachingFactory factory;
 	protected final BufferType bufferType = BufferType.Array;
-	protected final List<IIntMemoryBuffer> indexList;
+	final List<IIntMemoryBuffer> bufferList;
 	protected int currentNumBits = 0;
 	protected int lastBufferIndex;
 	protected int lastBufferSize;
@@ -21,7 +26,7 @@ public class StringListImpl extends AbstractDictionaryStringList {
 	
 	public StringListImpl() {
 		super();
-		indexList = new ArrayList<IIntMemoryBuffer>();
+		bufferList = new ArrayList<IIntMemoryBuffer>();
 		factory = new BufferCachingFactory();
 		lastMemoryBuffer = createNewBuffer(0);
 		
@@ -48,10 +53,10 @@ public class StringListImpl extends AbstractDictionaryStringList {
 		// Go to next bigger bit size.  Copy values from current buffer
 		// to new array.  Set indexes appropriately
 		currentNumBits = Math.max(logNumBits, currentNumBits);
-		IIntMemoryBuffer oldBuffer = indexList.remove(indexList.size()-1);
+		IIntMemoryBuffer oldBuffer = bufferList.remove(bufferList.size()-1);
 		buffer = factory.tradeForNewBufferAndCopy(currentNumBits, oldBuffer);
-		indexList.add(buffer);
-		lastBufferIndex = indexList.size() - 1;
+		bufferList.add(buffer);
+		lastBufferIndex = bufferList.size() - 1;
 		lastBufferSize = buffer.getSize();
 		return buffer;
 	}
@@ -60,8 +65,8 @@ public class StringListImpl extends AbstractDictionaryStringList {
 		IIntMemoryBuffer buffer;
 		currentNumBits = Math.max(logNumBits, currentNumBits);
 		buffer = factory.getNewBuffer(currentNumBits);
-		indexList.add(buffer);
-		lastBufferIndex = indexList.size() - 1;
+		bufferList.add(buffer);
+		lastBufferIndex = bufferList.size() - 1;
 		lastBufferSize = 0;
 		return buffer;
 	}
@@ -81,14 +86,14 @@ public class StringListImpl extends AbstractDictionaryStringList {
 		int bufferIndex = i >> IIntMemoryBuffer.NUM_BITS;
 		int bitIndex = i & IIntMemoryBuffer.BUFFER_SIZE_MODULO_MASK; 
 		
-		return indexList.get(bufferIndex).getValue(bitIndex);
+		return bufferList.get(bufferIndex).getValue(bitIndex);
 	}
 
 	@Override
 	public MemorySizeInfo getIndexSizeInBytes() {
 		long sizeInBytes = 0;
 		long waistedSizeInBytes = 0;
-		for(IMemoryBuffer buffer : indexList) {
+		for(IMemoryBuffer buffer : bufferList) {
 			sizeInBytes += buffer.getSizeInBytes();
 			waistedSizeInBytes += buffer.getWaistedSizeInBytes();
 		}
@@ -114,6 +119,21 @@ public class StringListImpl extends AbstractDictionaryStringList {
 	public String[] getUniqueNGrams(int n) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int writeData(RandomAccessFile file, CompressionType compression, int bufferIndex) throws IOException {
+		return bufferList.get(bufferIndex).writeData(file, compression);
+	}
+
+	@Override
+	public int readData(File fle, CompressionType compression, int index, int numBytes, int numRecords) throws IOException {
+		return 0;
+	}
+
+	@Override
+	public List<? extends IMemoryBuffer> getBufferList() {
+		return bufferList;
 	}
 	
 	

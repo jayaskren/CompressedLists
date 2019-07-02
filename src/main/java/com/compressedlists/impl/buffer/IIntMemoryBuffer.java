@@ -1,5 +1,10 @@
 package com.compressedlists.impl.buffer;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
+import com.compressedlists.CompressionType;
+
 public interface IIntMemoryBuffer extends IMemoryBuffer {
 
 	final int NUM_BITS = 16;
@@ -8,6 +13,6 @@ public interface IIntMemoryBuffer extends IMemoryBuffer {
 	void addValue(int value);
 	void setValue(int pos, int value);
 	int getValue(int pos);
-	int getNumBits();
+	int getLogOfBitsPerRow(); 
 	void copy(IIntMemoryBuffer other);
 }

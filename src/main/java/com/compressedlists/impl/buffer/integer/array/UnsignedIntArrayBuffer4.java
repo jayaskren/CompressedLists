@@ -7,6 +7,11 @@ public class UnsignedIntArrayBuffer4 extends UnsignedIntArrayBuffer8 implements 
 	
 	@Override
 	public int getWaistedSizeInBytes() {
-		return (BUFFER_SIZE - size) + (size *4)/8;
+		return (BUFFER_SIZE - size) + (size * 4)/8;
+	}
+	
+	@Override
+	public int getLogOfBitsPerRow() {
+		return 2;
 	}
 }

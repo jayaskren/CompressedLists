@@ -32,7 +32,7 @@ public class FileUtils {
 		}
 		
 		try (FileReader reader = new FileReader(file);
-				CSVReader csvReader = new CSVReader(reader, delimiter, '\0')) {
+				CSVReader csvReader = new CSVReader(reader, delimiter, '"')) {
 			String[] header = csvReader.readNext();
 			
 			columntypes = new DataType[header.length];
@@ -76,7 +76,7 @@ public class FileUtils {
 						
 						if (columns[i].hasMaxUniqueValues()) {
 							switch (columns[i].getDataType()) {
-							case TEXT:
+							case STRING:
 								TextList col = (TextList) columns[i];
 								// Convert to Compressed column
 								columns[i] = new TextListImpl(col);
@@ -111,4 +111,6 @@ public class FileUtils {
 		
 		return dataTable;
 	}
+	
+	
 }

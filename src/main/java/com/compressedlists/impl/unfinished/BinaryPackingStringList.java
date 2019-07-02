@@ -3,9 +3,14 @@ package com.compressedlists.impl.unfinished;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.List;
 
+import com.compressedlists.CompressionType;
 import com.compressedlists.impl.AbstractDictionaryStringList;
+import com.compressedlists.impl.buffer.IMemoryBuffer;
 import com.compressedlists.impl.buffer.MemorySizeInfo;
 
 import me.lemire.integercompression.BinaryPacking;
@@ -98,6 +103,24 @@ public class BinaryPackingStringList extends AbstractDictionaryStringList {
 
 	@Override
 	public String[] getUniqueNGrams(int n) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int writeData(RandomAccessFile folder, CompressionType compression, int bufferIndex) throws IOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int readData(File folder, CompressionType compression, int bufferIndex, int numBytes, int numRecords) throws IOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<? extends IMemoryBuffer> getBufferList() {
 		// TODO Auto-generated method stub
 		return null;
 	}

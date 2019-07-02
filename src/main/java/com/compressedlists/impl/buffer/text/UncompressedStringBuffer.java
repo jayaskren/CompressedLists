@@ -1,5 +1,9 @@
 package com.compressedlists.impl.buffer.text;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
+import com.compressedlists.CompressionType;
 import com.compressedlists.impl.buffer.IStringArrayBuffer;
 
 public class UncompressedStringBuffer implements IStringArrayBuffer {
@@ -65,5 +69,18 @@ public class UncompressedStringBuffer implements IStringArrayBuffer {
 	@Override
 	public void reset() {
 		size = 0;
+	}
+
+	@Override
+	public int writeData(RandomAccessFile file, CompressionType compression) throws IOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void readFromFile(RandomAccessFile file, CompressionType compression, int numRecords, int numBytes)
+			throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 }

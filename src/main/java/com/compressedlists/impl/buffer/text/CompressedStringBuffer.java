@@ -2,9 +2,11 @@ package com.compressedlists.impl.buffer.text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.compressedlists.CompressionType;
 import com.compressedlists.impl.buffer.IMemoryBuffer;
 
 public class CompressedStringBuffer implements IMemoryBuffer {
@@ -108,6 +110,35 @@ public class CompressedStringBuffer implements IMemoryBuffer {
 	@Override
 	public void reset() {
 		size = 0;
+	}
+
+	@Override
+	public int writeData(RandomAccessFile file, CompressionType compression) throws IOException {
+		switch (compression) {
+		case GZIP:
+			
+			break;
+		case LZ4:
+			
+			break;
+		case SNAPPY:
+			
+			break;
+		case ZSTD:
+			
+			break;
+		default:
+			file.write(compressedData, 0, compressedData.length);
+			return compressedData.length;
+		}
+		return 0;
+	}
+
+	@Override
+	public void readFromFile(RandomAccessFile file, CompressionType compression, int numRecords, int numBytes)
+			throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

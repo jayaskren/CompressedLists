@@ -1,15 +1,20 @@
 package com.compressedlists.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.HdrHistogram.Histogram;
 
+import com.compressedlists.impl.buffer.IMemoryBuffer;
 import com.compressedlists.impl.buffer.IStringArrayBuffer;
 import com.compressedlists.impl.buffer.integer.CompressedIntegerBuffer;
 import com.compressedlists.impl.buffer.integer.IntegerParser;
 import com.compressedlists.impl.buffer.integer.UncompressedIntegerBuffer;
 import com.compressedlists.IntList;
+import com.compressedlists.CompressionType;
 import com.compressedlists.DataType;
 
 public class IntListImpl implements IntList {
@@ -163,4 +168,20 @@ public class IntListImpl implements IntList {
 		return 0;
 	}
 
+	@Override
+	public int writeData(RandomAccessFile folder, CompressionType compression, int bufferIndex) throws IOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int readData(File folder, CompressionType compression, int bufferIndex, int numBytes, int numRecords) throws IOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	public List<? extends IMemoryBuffer> getBufferList() {
+		return buffers;
+	}
 }

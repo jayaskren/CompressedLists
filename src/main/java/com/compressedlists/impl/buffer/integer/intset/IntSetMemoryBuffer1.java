@@ -1,5 +1,9 @@
 package com.compressedlists.impl.buffer.integer.intset;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
+import com.compressedlists.CompressionType;
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 
 import gnu.trove.set.hash.TIntHashSet;
@@ -59,7 +63,7 @@ public class IntSetMemoryBuffer1 implements IIntMemoryBuffer {
 	}
 
 	@Override
-	public int getNumBits() {
+	public int getLogOfBitsPerRow() {
 		return 0;
 	}
 
@@ -74,5 +78,18 @@ public class IntSetMemoryBuffer1 implements IIntMemoryBuffer {
 		for (int i=0; i < count; i++) {
 			setValue(i, other.getValue(i));
 		}
+	}
+
+	@Override
+	public int writeData(RandomAccessFile file, CompressionType compression) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void readFromFile(RandomAccessFile file, CompressionType compression, int numRecords, int numBytes)
+			throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 }

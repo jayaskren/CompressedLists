@@ -1,5 +1,9 @@
 package com.compressedlists.impl.buffer.integer;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
+import com.compressedlists.CompressionType;
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 import com.compressedlists.impl.buffer.IMemoryBuffer;
 
@@ -51,5 +55,18 @@ public class CompressedIntegerBuffer implements IMemoryBuffer {
 		int[] data = new int[IIntMemoryBuffer.BUFFER_SIZE];
 		IntegerCompressor.getInstance().uncompress(compressedData, data);
 		return new UncompressedIntegerBuffer(data, min, max);
+	}
+
+	@Override
+	public int writeData(RandomAccessFile file, CompressionType compression) throws IOException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void readFromFile(RandomAccessFile file, CompressionType compression, int numRecords, int numBytes)
+			throws IOException {
+		// TODO Auto-generated method stub
+		
 	}
 }
