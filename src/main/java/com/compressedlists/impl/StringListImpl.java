@@ -83,8 +83,8 @@ public class StringListImpl extends AbstractDictionaryStringList {
 
 	@Override
 	public int getIndexValue(int i) {
-		int bufferIndex = i >> IIntMemoryBuffer.NUM_BITS;
-		int bitIndex = i & IIntMemoryBuffer.BUFFER_SIZE_MODULO_MASK; 
+		int bufferIndex = i >> IIntMemoryBuffer.NUM_BITS;  // Same as i /  16
+		int bitIndex = i & IIntMemoryBuffer.BUFFER_SIZE_MODULO_MASK; // Same i % 
 		
 		return bufferList.get(bufferIndex).getValue(bitIndex);
 	}
