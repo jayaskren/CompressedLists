@@ -1,6 +1,5 @@
 package com.compressedlists.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -8,6 +7,8 @@ import java.util.List;
 
 import org.HdrHistogram.Histogram;
 
+import com.compressedlists.impl.buffer.BitUtil;
+import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 import com.compressedlists.impl.buffer.IMemoryBuffer;
 import com.compressedlists.impl.buffer.IStringArrayBuffer;
 import com.compressedlists.impl.buffer.MemorySizeInfo;
@@ -22,21 +23,31 @@ public class TextListImpl implements TextList {
 	Histogram histogram = null; //new Histogram(3600000000000L, 3);
 	List<CompressedStringBuffer> buffers;
 	private int size = 0;
-	private long sizeInBytes = 0;
-	private UncompressedStringBuffer lastStringBuffer;
+	private long compressedSizeInBytes = 0;
+	UncompressedStringBuffer lastStringBuffer;
 	private UncompressedStringBuffer retrievedStringBuffer;
 	private int retrievedBufferNum = -1;
 	long totalTimeProcessed = 0l;
 	long originalSize = 0l;
 	
+	public TextListImpl(List<TextBufferMetadata> mdList) {
+		this.buffers = new ArrayList<>();
+		for (int i=0; i < mdList.size() - 1; i++) {
+			buffers.add(new CompressedStringBuffer(mdList.get(i).getUncompressedByteSize()));
+		}
+		lastStringBuffer=new UncompressedStringBuffer();
+		retrievedStringBuffer = new UncompressedStringBuffer();
+	}
+	
 	public TextListImpl(TextList column) {
 		this();
+		lastStringBuffer = new UncompressedStringBuffer();
+		retrievedStringBuffer = new UncompressedStringBuffer();
 		
 		for(int i=0; i<column.getSize(); i++) {
 			addValue(column.getValue(i));
 		}
-		lastStringBuffer = new UncompressedStringBuffer();
-		retrievedStringBuffer = new UncompressedStringBuffer();
+		
 		if (column.getHistogram() != null) {
 			this.histogram = column.getHistogram().copy();
 		}
@@ -52,22 +63,12 @@ public class TextListImpl implements TextList {
 	public void addValue(String str) {
 		long begin = System.nanoTime();
 		lastStringBuffer.addValue(str);
-		size ++;
 //		System.out.println(size);
+		
 		if (lastStringBuffer.getSize() == lastStringBuffer.BUFFER_SIZE) {
-			// TODO what is this all zeroes doing.  I think this was debugging?
-//			boolean allZeroes = true;
-//			for (int i=0; i < 10 ; i++) {
-//				if (lastStringBuffer.getValue(i) != "0"){
-//					allZeroes = false;
-//				}
-//			}
-//			if(allZeroes) {
-//				System.out.println("Error Adding " + str + " Found all Zeroes");
-//			}
 			CompressedStringBuffer buffer = lastStringBuffer.compressToBuffer();
 			buffers.add(buffer);
-			sizeInBytes += buffer.getSizeInBytes();
+			compressedSizeInBytes += buffer.getSizeInBytes();
 			lastStringBuffer = new UncompressedStringBuffer();
 		}
 		long timeProcessed = System.nanoTime() - begin;
@@ -75,6 +76,7 @@ public class TextListImpl implements TextList {
 		if (histogram != null) {
 			histogram.recordValue(timeProcessed);
 		}
+		size ++;
 		originalSize+=str.length();
 	}
 	
@@ -91,7 +93,12 @@ public class TextListImpl implements TextList {
 		
 		if (bufferNum == buffers.size()) {
 			// last buffer
-			return this.lastStringBuffer.getValue(index);
+			try {
+				return this.lastStringBuffer.getValue(index);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				e.printStackTrace();
+				throw e;
+			}
 		} else if (bufferNum == this.retrievedBufferNum) {
 //			if (index >= retrievedStringBuffer.getSize()) {
 //				System.out.println("Error at index " + index);
@@ -99,8 +106,13 @@ public class TextListImpl implements TextList {
 			return this.retrievedStringBuffer.getValue(index);
 		} else {
 			retrievedBufferNum = bufferNum;
-			this.buffers.get(bufferNum).uncompressToBuffer(retrievedStringBuffer);
-			return this.retrievedStringBuffer.getValue(index);
+			try {
+				this.buffers.get(bufferNum).uncompressToBuffer(retrievedStringBuffer);
+				return this.retrievedStringBuffer.getValue(index);
+			} catch (IndexOutOfBoundsException e) {
+				e.printStackTrace();
+				throw e;
+			}
 		}
 		
 //		CompressedStringBuffer buffer = buffers.get(bufferNum);
@@ -134,7 +146,7 @@ public class TextListImpl implements TextList {
 
 	@Override
 	public long getSizeInBytes() {
-		return sizeInBytes;
+		return compressedSizeInBytes + lastStringBuffer.getSizeInBytes() + retrievedStringBuffer.getSizeInBytes();
 	}
 
 	@Override
@@ -149,7 +161,7 @@ public class TextListImpl implements TextList {
 
 	@Override
 	public int getUniqueValuesSize() {
-		return -1;
+		return 0;
 	}
 
 	public Histogram getHistogram() {
@@ -185,18 +197,43 @@ public class TextListImpl implements TextList {
 	}
 
 	@Override
-	public int writeData(RandomAccessFile file, CompressionType compression, int bufferIndex) throws IOException {
+	public int writeData(RandomAccessFile file, CompressionType compression, int bufferIndex, BufferMetadata metadata) throws IOException {
+		if (buffers.size() == bufferIndex ) {
+			CompressedStringBuffer buffer = lastStringBuffer.compressToBuffer();
+			TextBufferMetadata md = (TextBufferMetadata) metadata;
+			md.setUncompressedByteSize(buffer.getUncompressedByteSize());
+			md.setCompressedByteSize(buffer.getCompressedByteSize());
+			return buffer.writeData(file, compression);
+		}
 		return buffers.get(bufferIndex).writeData(file, compression);
 	}
 
 	@Override
-	public int readData(File folder, CompressionType compression, int bufferIndex, int numBytes, int numRecords) throws IOException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int readData(RandomAccessFile file, CompressionType compression, int bufferIndex, int numBytes, int numRecords, BufferMetadata metadata) throws IOException {
+		size += numRecords;
+		if (bufferIndex == buffers.size()) {
+			CompressedStringBuffer tempBuffer = new CompressedStringBuffer(((TextBufferMetadata) metadata).uncompressedByteSize);
+			int numBytesRead = tempBuffer.readFromFile(file, compression, numBytes, numRecords);
+			tempBuffer.uncompressToBuffer(this.lastStringBuffer);
+			return numBytesRead;
+		} 
+		int bytesRead = buffers.get(bufferIndex).readFromFile(file, compression, numBytes, numRecords);
+		this.compressedSizeInBytes += bytesRead;
+		return bytesRead;
 	}
 	
 	@Override
 	public List<? extends IMemoryBuffer> getBufferList() {
 		return buffers;
+	}
+
+	@Override
+	public int getBufferSize(int i) {
+		if (i == buffers.size()) {
+			return lastStringBuffer.getSize();
+		} else {
+			return buffers.get(i).getSize();
+		}
+		
 	}
 }

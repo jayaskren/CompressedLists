@@ -1,6 +1,5 @@
 package com.compressedlists.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -90,6 +89,11 @@ public class IntListImpl implements IntList {
 	}
 
 	@Override
+	public int getBufferSize(int i) {
+		return buffers.size()+1;
+	}
+
+	@Override
 	public String getValueDisplay(int i) {
 		return Integer.toString(getValue(i));
 	}
@@ -169,13 +173,13 @@ public class IntListImpl implements IntList {
 	}
 
 	@Override
-	public int writeData(RandomAccessFile folder, CompressionType compression, int bufferIndex) throws IOException {
+	public int writeData(RandomAccessFile folder, CompressionType compression, int bufferIndex, BufferMetadata metadata) throws IOException {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public int readData(File folder, CompressionType compression, int bufferIndex, int numBytes, int numRecords) throws IOException {
+	public int readData(RandomAccessFile folder, CompressionType compression, int bufferIndex, int numBytes, int numRecords, BufferMetadata metadata) throws IOException {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -184,4 +188,5 @@ public class IntListImpl implements IntList {
 	public List<? extends IMemoryBuffer> getBufferList() {
 		return buffers;
 	}
+
 }

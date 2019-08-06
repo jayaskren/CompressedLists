@@ -1,5 +1,6 @@
 package com.compressedlists.impl.buffer.text;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,25 @@ public class CompressedStringBufferTest {
 		
 		bytes = CompressedStringBuffer.stringsToBytes(text);
 		newStrings= CompressedStringBuffer.bytesToStrings(bytes);
+		assertEquals(text.length, newStrings.length);
+		
+		text = new String[]{"1", "","","4","1", "", "", ""};
+		bytes = CompressedStringBuffer.stringsToBytes(text);
+		newStrings= CompressedStringBuffer.bytesToStrings(bytes);
+		assertEquals(text.length, newStrings.length);
+		assertArrayEquals(text, newStrings);
+	}
+	
+	@Test
+	public void testEmptyStrings() {
+		String[] text = new String[65536];
+		for(int i=0; i < text.length; i++) {
+			text[i] = "";
+		}
+		byte[] bytes = CompressedStringBuffer.stringsToBytes(text);
+		System.out.println("Length " + bytes.length);
+//		assertEquals(65536, bytes.length);
+		String[] newStrings= CompressedStringBuffer.bytesToStrings(bytes);
 		assertEquals(text.length, newStrings.length);
 	}
 }

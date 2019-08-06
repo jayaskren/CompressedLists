@@ -62,7 +62,7 @@ public class FileUtils {
 					}
 				}
 				
-				String[] nextLine = csvReader.readNext();
+				String[] nextLine = null;
 				
 
 				while ((nextLine = csvReader.readNext()) != null) {

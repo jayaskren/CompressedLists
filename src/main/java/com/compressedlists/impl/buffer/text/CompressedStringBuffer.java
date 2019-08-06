@@ -12,8 +12,12 @@ import com.compressedlists.impl.buffer.IMemoryBuffer;
 public class CompressedStringBuffer implements IMemoryBuffer {
 
 	private int size;
-	public final byte[] compressedData;
+	public byte[] compressedData;
 	private int uncompressedByteSize = 0;
+	
+	public CompressedStringBuffer(int uncompressedByteSize) {
+		this.uncompressedByteSize = uncompressedByteSize;
+	}
 	
 	public CompressedStringBuffer(String[] values){
 		size = values.length;
@@ -69,9 +73,11 @@ public class CompressedStringBuffer implements IMemoryBuffer {
 		try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 			for (int i=0; i<strings.length ; i++) {
 				String str = strings[i];
-				os.write(stringToBytesUTFCustom(str));
-				os.write(0);
-				os.write(0);
+				if (str != null) {
+					os.write(stringToBytesUTFCustom(str));
+					os.write(0);
+					os.write(0);
+				}
 			}
 			return os.toByteArray();
 		} catch (IOException e) {
@@ -135,10 +141,20 @@ public class CompressedStringBuffer implements IMemoryBuffer {
 	}
 
 	@Override
-	public void readFromFile(RandomAccessFile file, CompressionType compression, int numRecords, int numBytes)
+	public int readFromFile(RandomAccessFile file, CompressionType compression, int numBytes, int numRecords)
 			throws IOException {
-		// TODO Auto-generated method stub
+		compressedData = new byte[numBytes];
 		
+		int numBytesRead = file.read(compressedData, 0, numBytes);
+		size = numRecords;
+		return numBytesRead; 
+	}
+
+	public int getUncompressedByteSize() {
+		return uncompressedByteSize;
 	}
 	
+	public int getCompressedByteSize() {
+		return compressedData.length;
+	}
 }

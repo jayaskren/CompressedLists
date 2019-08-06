@@ -17,6 +17,6 @@ public interface IMemoryBuffer {
 	
 	public int writeData(RandomAccessFile file, CompressionType compression) throws IOException;
 	
-	public void readFromFile(RandomAccessFile file, CompressionType compression, int numRecords, int numBytes) throws IOException;
+	public int readFromFile(RandomAccessFile file, CompressionType compression, int numBytes, int numRecords) throws IOException;
 
 }

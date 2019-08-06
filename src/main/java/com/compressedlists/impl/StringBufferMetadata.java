@@ -7,30 +7,39 @@ import com.jsoniter.annotation.JsonIgnore;
 
 public class StringBufferMetadata extends BufferMetadata {
 	
-	@JsonIgnore
-	StringListImpl column;
+	int numBitsPerRow;
+	
+	public StringBufferMetadata(int pos, int start, int numRows, int numBitsPerRow) {
+		super(pos, start, numRows);
+		this.numBitsPerRow = numBitsPerRow;
+	}
+	
 	
 	public StringBufferMetadata(StringListImpl column, int pos) {
 		super(pos);
-		this.column = column;
+		IMemoryBuffer buf = column.getBufferList().get(pos);
+		this.numRows = buf.getSize();
+//		this.start = 
+		if (column.getUniqueValuesSize() >1) {
+			if (buf instanceof IIntMemoryBuffer) {
+				numBitsPerRow = Math.max(8, (int)Math.pow(2, ((IIntMemoryBuffer)buf).getLogOfBitsPerRow()));
+			} else {
+				numBitsPerRow = -1;
+			}
+			
+		} else {
+			numBitsPerRow = 0;
+		}
 	}
 	
 	public int getNumBitsPerRow() {
-		IMemoryBuffer buf = column.getBufferList().get(pos);
-		if (column.getUniqueValuesSize() >1) {
-			if (buf instanceof IIntMemoryBuffer) {
-				return (int)Math.pow(2, ((IIntMemoryBuffer)buf).getLogOfBitsPerRow());
-			}
-		} else {
-			return 0;
-		}
-		return -1;
+		return numBitsPerRow;
 	}
 	
-	@Override
-	@JsonIgnore
-	public CompressedList getColumn() {
-		return column;
-	}
+//	@Override
+//	@JsonIgnore
+//	public CompressedList getColumn() {
+//		return column;
+//	}
 	
 }

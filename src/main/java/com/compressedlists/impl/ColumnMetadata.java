@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.compressedlists.CompressedList;
 import com.compressedlists.DataType;
+import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 import com.jsoniter.annotation.JsonCreator;
 import com.jsoniter.annotation.JsonIgnore;
 import com.jsoniter.annotation.JsonProperty;
@@ -39,8 +40,10 @@ public class ColumnMetadata {
 			}
 		} else if (column instanceof TextListImpl) {
 			TextListImpl col = (TextListImpl) column;
-			bufferMetadata = new ArrayList<>(col.buffers.size());
-			for (int i=0; i <col.buffers.size() ; i++) {
+			// Add an extra buffer, because the last buffer is an uncompressed buffer
+			int numBuffers = col.getSize()/IIntMemoryBuffer.BUFFER_SIZE+1;
+			bufferMetadata = new ArrayList<>(numBuffers);
+			for (int i=0; i < numBuffers; i++) {
 				bufferMetadata.add(new TextBufferMetadata(col, i));
 			}
 		}  else if (column instanceof IntListImpl) {

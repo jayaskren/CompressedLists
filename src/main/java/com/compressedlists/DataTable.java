@@ -7,7 +7,10 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.function.Consumer;
 
 import com.compressedlists.impl.StringBufferMetadata;
 import com.compressedlists.impl.BufferMetadata;
@@ -99,20 +102,33 @@ public class DataTable {
 				for (int j=0; j < getNumColumns(); j++) {
 					CompressedList col = columns[j];
 					int numBytesWritten = 0;
+					
+					BufferMetadata  bufMd = null;
 					if (col instanceof StringListImpl) {
+						bufMd = columnMetadata[j].getBufferMetadata().get(i);
 						StringListImpl lst = (StringListImpl) col;
 						if (lst.getUniqueValuesSize() > 1) {
-							numBytesWritten = col.writeData(file, compression, i);
+							numBytesWritten = col.writeData(file, compression, i, bufMd);
 						} else {
 							numBytesWritten = 0;
 						}
+					} else if (col instanceof TextListImpl) {
+						try {
+							bufMd = columnMetadata[j].getBufferMetadata().get(i);
+							numBytesWritten = col.writeData(file, compression, i, bufMd);
+						} catch (IndexOutOfBoundsException e) {
+							e.printStackTrace();
+							throw e;
+						}
 					} else {
-						numBytesWritten = col.writeData(file, compression, i);
+						bufMd = columnMetadata[j].getBufferMetadata().get(i);
+						numBytesWritten = col.writeData(file, compression, i, bufMd);
 					}
-					BufferMetadata  bufMd = columnMetadata[j].getBufferMetadata().get(i);
+					
 					bufMd.setStart(totalBufferBytes);
-					bufMd.setLength(numBytesWritten);
+					bufMd.setNumRows(col.getBufferSize(i));
 					totalBufferBytes += numBytesWritten;
+					
 				}
 			}	
 		}
@@ -125,34 +141,95 @@ public class DataTable {
 	}
 	
 	/**This is still work in progress*/
-	public static DataTable readData(File folder) throws IOException {
+	public static DataTable readData(File folder, IUpdatable progress) throws IOException {
 		// Read metadata.json
+		long begin = System.currentTimeMillis();
 		File jsonFile = new File(folder, "metadata.json");
 		
 		String json = new String(Files.readAllBytes(jsonFile.toPath()), "UTF-8");
 		JsonIterator iter = JsonIterator.parse(json);
 		Any entireObject = iter.readAny();
-		Any columns = entireObject.get("columnMetadata");
+		Any columnsAny = entireObject.get("columnMetadata");
 		int numColumns = entireObject.toInt("numColumns");
-		int bufferCount = entireObject.toInt("bufferCount");
-		int numRows = entireObject.toInt("numRows");
-		
+//		int bufferCount = entireObject.toInt("bufferCount");
+//		int totalNumRows = entireObject.toInt("numRows");
+		CompressedList[] columns = new CompressedList[numColumns];
 		List<String> columnNames = new ArrayList<>();
+//		List<CompressedList> columns = new ArrayList<>();
 		int colNum=0;
-		for (Any colMdAny: columns) {
+		if (progress != null) {
+			progress.setMax(numColumns);
+		}
+		for (Any colMdAny: columnsAny) {
 			String colName = colMdAny.toString("name");
 			columnNames.add(colName);
 			DataType colType = DataType.valueOf(colMdAny.toString("type"));
-//			BufferMetadata buffMd = null;
+			colMdAny.toString("Compression");
 			CompressedList col = null;
+			int bufCount = 0;
+			Any bufMdAny = colMdAny.get("bufferMetadata");
+			
+			ListIterator<Any> bufIter = bufMdAny.asList().listIterator();
 			
 			switch (colType) {
 			case STRING:
-				col = new StringListImpl();
-				String[] uniqueValues = colMdAny.get("uniqueValues").asList().toArray(new String[0]);
+				
+				Iterator<Any> tempUniqueValusIter = colMdAny.get("uniqueValues").asList().iterator();
+				List<StringBufferMetadata> stringBufDataList = new ArrayList<>();
+				final List<String> tempUniqueValuesList= new ArrayList<>();
+				
+				tempUniqueValusIter.forEachRemaining(new Consumer<Any>() {
+					@Override
+					public void accept(Any t) {
+						tempUniqueValuesList.add(t.toString());
+					}
+				});
+				
+				
+				while (bufIter.hasNext()) {
+					Any next = bufIter.next();
+					int numBitsPerRow = next.toInt("numBitsPerRow");
+					int startPos = next.toInt("start");
+					int numRows = next.toInt("numRows");
+					StringBufferMetadata md = new StringBufferMetadata(bufCount, startPos, numRows, numBitsPerRow);
+					
+//						IIntMemoryBuffer buffer = Factor
+					stringBufDataList.add(md);
+					bufCount ++;
+				}
+				col = new StringListImpl(tempUniqueValuesList, stringBufDataList);
+				
+				for (int i=0; i < stringBufDataList.size(); i++) {
+					try (RandomAccessFile file = new RandomAccessFile(new File(folder, "index_"+ i + ".dat"), "r")) {
+						StringBufferMetadata md = stringBufDataList.get(i);
+						file.seek(md.getStart());
+						col.readData(file, CompressionType.DEFAULT, i, md.getNumRows()*md.getNumBitsPerRow()/8, md.getNumRows(), md);
+					}
+				}
+				
 				break;
 			case TEXT:
-				col = new TextListImpl();
+				List<TextBufferMetadata> textBufDataList = new ArrayList<>();
+				while (bufIter.hasNext()) {
+					Any next = bufIter.next();
+					int uncompressedBytes = next.toInt("uncompressedByteSize");
+					int compressedBytes = next.toInt("compressedByteSize");
+					int startPos = next.toInt("start");
+					int numRows = next.toInt("numRows");
+					TextBufferMetadata md = new TextBufferMetadata(bufCount, startPos, numRows, uncompressedBytes, compressedBytes);
+					
+					textBufDataList.add(md);
+					bufCount ++;
+				}
+				col = new TextListImpl(textBufDataList);
+				
+				for (int i=0; i < textBufDataList.size(); i++) {
+					try (RandomAccessFile file = new RandomAccessFile(new File(folder, "index_"+ i + ".dat"), "r")) {
+						TextBufferMetadata md = textBufDataList.get(i);
+						file.seek(md.getStart());
+						col.readData(file, CompressionType.DEFAULT, i, md.getCompressedByteSize(), md.getNumRows(), md);
+					}
+				}
 				break;
 			case INT:
 				col = new IntListImpl();
@@ -160,46 +237,20 @@ public class DataTable {
 			default:
 				break;
 			}
-			
-			Any buffMdListAny = colMdAny.get("Metadata");
-			int row = 0;
-			for (Any bufMdAny : buffMdListAny) {
-				int start = bufMdAny.toInt("start");
-				int length = bufMdAny.toInt("length");
-				BufferMetadata bufMd = null;
-				switch (colType) {
-				case STRING:
-					int numBitsPerRow = bufMdAny.toInt("numBitsPerRow");
-					bufMd = new StringBufferMetadata((StringListImpl)col, row);
-//					((StringBufferMetadata) bufMd).set
-					break;
-				case TEXT:
-					bufMd = new TextBufferMetadata((TextListImpl)col, row);
-					
-					break;
-
-				case INT:
-					bufMd = new IntBufferMetadata((IntListImpl)col, row);
-					break;
-				default:
-					break;
-				}
-				row ++;
-			}
+			columns[colNum] = col;
 			colNum++;
+			if (progress != null) {
+				progress.updateProgress(colNum, "Loading Column " + colNum+1);
+			}
 		}
 		
-
-		DataTable table = new DataTable();
-		return table;
-		
-		
-//		int bufferCount = getNumRows();
-//		for(int i=0; i < bufferCount ; i++) {
-//			CompressedList col = columns[i];
-////			col.readData(folder, compression, bufferIndex, numBytes, numRecords);
-//		}
-		
+		String[] header = columnNames.toArray(new String[columnNames.size()]);
+		DataTable table = new DataTable(columns, header, header);
+		System.out.println("Loaded in " + (System.currentTimeMillis() - begin) + "ms");
+		if (progress != null) {
+			progress.finish();
+		}
+		return table;		
 	}
 
 	

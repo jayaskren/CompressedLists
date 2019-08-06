@@ -64,9 +64,9 @@ public class CompressedIntegerBuffer implements IMemoryBuffer {
 	}
 
 	@Override
-	public void readFromFile(RandomAccessFile file, CompressionType compression, int numRecords, int numBytes)
+	public int readFromFile(RandomAccessFile file, CompressionType compression, int numBytes, int numRecords)
 			throws IOException {
 		// TODO Auto-generated method stub
-		
+		return 0;
 	}
 }

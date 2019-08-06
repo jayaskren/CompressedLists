@@ -1,12 +1,12 @@
 package com.compressedlists;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.List;
 
 import org.HdrHistogram.Histogram;
 
+import com.compressedlists.impl.BufferMetadata;
 import com.compressedlists.impl.buffer.IMemoryBuffer;
 import com.jsoniter.annotation.JsonIgnore;
 
@@ -15,6 +15,8 @@ public interface CompressedList {
 	public DataType getDataType();
 
 	public int getSize();
+	
+	public int getBufferSize(int i);
 
 	void addValue(String str);
 
@@ -38,8 +40,9 @@ public interface CompressedList {
 	@JsonIgnore
 	public long getOriginalSizeInBytes();
 	
-	public int writeData(RandomAccessFile folder, CompressionType compression, int bufferIndex) throws IOException ;
+	public int writeData(RandomAccessFile folder, CompressionType compression, int bufferIndex, BufferMetadata metadata) throws IOException ;
 	
-	public int readData(File folder, CompressionType compression, int bufferIndex, int numBytes, int numRecords) throws IOException;
+	public int readData(RandomAccessFile folder, CompressionType compression, int bufferIndex, int numBytes, int numRecords, BufferMetadata metadata) throws IOException;
 
+	
 }

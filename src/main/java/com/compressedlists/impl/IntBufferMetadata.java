@@ -12,10 +12,10 @@ public class IntBufferMetadata extends BufferMetadata {
 		this.column = column;
 	}
 
-	@Override
-	@JsonIgnore
-	public CompressedList getColumn() {
-		return column;
-	}
+//	@Override
+//	@JsonIgnore
+//	public CompressedList getColumn() {
+//		return column;
+//	}
 
 }

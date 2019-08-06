@@ -201,4 +201,14 @@ public class BitUtilTest {
 			assertEquals(BitUtil.binlog(BitUtil.binlog(i)) + 1, BitUtil.numBits(i), "Not Equal for i = "+i);
 		}
 	}
+	
+	public static void main(String[] args) {
+		int i = 129;
+		int j = 130;
+		char val = (char) ((i & 0xff) | ((j & 0xff) << 8));
+		System.out.println((int)val);
+		
+		System.out.println(val & 0xff);
+		System.out.println((val>> 8) & 0xff);
+	}
 }

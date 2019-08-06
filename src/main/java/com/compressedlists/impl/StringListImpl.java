@@ -1,6 +1,5 @@
 package com.compressedlists.impl;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -13,13 +12,14 @@ import com.compressedlists.impl.buffer.BufferType;
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 import com.compressedlists.impl.buffer.IMemoryBuffer;
 import com.compressedlists.impl.buffer.MemorySizeInfo;
-import com.compressedlists.impl.buffer.integer.intset.IntSetMemoryBuffer1;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 public class StringListImpl extends AbstractDictionaryStringList {
-	protected final BufferCachingFactory factory;
-	protected final BufferType bufferType = BufferType.Array;
-	final List<IIntMemoryBuffer> bufferList;
-	protected int currentNumBits = 0;
+	BufferCachingFactory factory;
+	protected BufferType bufferType = BufferType.Array;
+	List<IIntMemoryBuffer> bufferList;
+	protected int currentLogNumBits = 0;
 	protected int lastBufferIndex;
 	protected int lastBufferSize;
 	protected IIntMemoryBuffer lastMemoryBuffer;
@@ -29,7 +29,20 @@ public class StringListImpl extends AbstractDictionaryStringList {
 		bufferList = new ArrayList<IIntMemoryBuffer>();
 		factory = new BufferCachingFactory();
 		lastMemoryBuffer = createNewBuffer(0);
-		
+	}
+	
+	public StringListImpl(List<String> uniqueValues, List<StringBufferMetadata> mdList) {
+		super(uniqueValues);
+		this.bufferList = new ArrayList<IIntMemoryBuffer>();
+		factory = new BufferCachingFactory();
+		for (StringBufferMetadata md : mdList ) {
+			createNewBuffer(BitUtil.log2nlz(md.getNumBitsPerRow()));
+		}
+		this.count.ensureCapacity(uniqueValues.size());
+		for (int i=0; i < uniqueValues.size(); i++) {
+			this.count.add(0);
+		}
+		lastMemoryBuffer = null;
 	}
 	
 	protected void addIndex(int index) {
@@ -40,7 +53,7 @@ public class StringListImpl extends AbstractDictionaryStringList {
 		if (lastBufferSize >=  IIntMemoryBuffer.BUFFER_SIZE) { 
 			// We need a new buffer. Create new one and set indexes appropriately
 			lastMemoryBuffer = createNewBuffer(logNumBits);	
-		} else if (logNumBits > currentNumBits) {
+		} else if (logNumBits > currentLogNumBits) {
 			lastMemoryBuffer = createAndCopyBuffer(logNumBits);
 		} 
 
@@ -52,9 +65,9 @@ public class StringListImpl extends AbstractDictionaryStringList {
 		IIntMemoryBuffer buffer;
 		// Go to next bigger bit size.  Copy values from current buffer
 		// to new array.  Set indexes appropriately
-		currentNumBits = Math.max(logNumBits, currentNumBits);
+		currentLogNumBits = Math.max(logNumBits, currentLogNumBits);
 		IIntMemoryBuffer oldBuffer = bufferList.remove(bufferList.size()-1);
-		buffer = factory.tradeForNewBufferAndCopy(currentNumBits, oldBuffer);
+		buffer = factory.tradeForNewBufferAndCopy(currentLogNumBits, oldBuffer);
 		bufferList.add(buffer);
 		lastBufferIndex = bufferList.size() - 1;
 		lastBufferSize = buffer.getSize();
@@ -63,8 +76,8 @@ public class StringListImpl extends AbstractDictionaryStringList {
 
 	protected IIntMemoryBuffer createNewBuffer(int logNumBits) {
 		IIntMemoryBuffer buffer;
-		currentNumBits = Math.max(logNumBits, currentNumBits);
-		buffer = factory.getNewBuffer(currentNumBits);
+		currentLogNumBits = Math.max(logNumBits, currentLogNumBits);
+		buffer = factory.getNewBuffer(currentLogNumBits);
 		bufferList.add(buffer);
 		lastBufferIndex = bufferList.size() - 1;
 		lastBufferSize = 0;
@@ -74,6 +87,11 @@ public class StringListImpl extends AbstractDictionaryStringList {
 	int getIndexValue(List<byte[]> currentList, int index, int bitIndex, int listIndex) {
 		byte[] currentArray = currentList.get(listIndex);
 		return currentArray[bitIndex];
+	}
+	
+	@Override
+	public int getBufferSize(int i) {
+		return bufferList.get(i).getSize();
 	}
 	
 	public void setValue(int i, String val) {
@@ -93,7 +111,7 @@ public class StringListImpl extends AbstractDictionaryStringList {
 	public MemorySizeInfo getIndexSizeInBytes() {
 		long sizeInBytes = 0;
 		long waistedSizeInBytes = 0;
-		for(IMemoryBuffer buffer : bufferList) {
+		for (IMemoryBuffer buffer : bufferList) {
 			sizeInBytes += buffer.getSizeInBytes();
 			waistedSizeInBytes += buffer.getWaistedSizeInBytes();
 		}
@@ -122,13 +140,23 @@ public class StringListImpl extends AbstractDictionaryStringList {
 	}
 
 	@Override
-	public int writeData(RandomAccessFile file, CompressionType compression, int bufferIndex) throws IOException {
+	public int writeData(RandomAccessFile file, CompressionType compression, int bufferIndex, BufferMetadata metadata) throws IOException {
 		return bufferList.get(bufferIndex).writeData(file, compression);
 	}
 
 	@Override
-	public int readData(File fle, CompressionType compression, int index, int numBytes, int numRecords) throws IOException {
-		return 0;
+	public int readData(RandomAccessFile file, CompressionType compression, int index, int numBytes, int numRecords, BufferMetadata metadata) throws IOException {
+		IIntMemoryBuffer buffer = bufferList.get(index);
+		this.size+=numRecords;
+//		metadata.
+		this.currentLogNumBits = BitUtil.log2nlz((numBytes/numRecords)*8); // TODO double check this
+		int bytesRead = buffer.readFromFile(file, compression, numBytes, numRecords);
+		
+//		for (int i=0; i < buffer.getSize() ; i++) {
+//			int uniqueValuesIndex = buffer.getValue(i);
+//			count.set(uniqueValuesIndex, count.getInt(uniqueValuesIndex) + 1); // TODO is there a faster way to do this?
+//		}
+		return bytesRead;
 	}
 
 	@Override

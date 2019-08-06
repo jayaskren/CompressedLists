@@ -1,7 +1,5 @@
 package com.compressedlists.impl;
 
-import com.compressedlists.CompressedList;
-import com.compressedlists.impl.buffer.IMemoryBuffer;
 import com.jsoniter.annotation.JsonIgnore;
 
 public abstract class BufferMetadata {
@@ -11,7 +9,13 @@ public abstract class BufferMetadata {
 	int pos;
 	
 	int start;
-	int length;
+	int numRows;
+	
+	public BufferMetadata(int pos, int start, int numRows) {
+		this(pos);
+		this.start = start;
+		this.numRows = numRows;
+	}
 
 	public BufferMetadata(int pos) {
 		this.pos = pos;
@@ -25,21 +29,21 @@ public abstract class BufferMetadata {
 		this.start = start;
 	}
 
-	public int getLength() {
-		return length;
+	public int getNumRows() {
+		return numRows;
 	}
 
-	public void setLength(int length) {
-		this.length = length;
+	public void setNumRows(int numRows) {
+		this.numRows = numRows;
 	}
 	
-	@JsonIgnore
-	public int getNumRecords() {
-		IMemoryBuffer buf = getColumn().getBufferList().get(pos);
-		return buf.getSize();
-	}
+//	@JsonIgnore
+//	public int getNumRecords() {
+//		IMemoryBuffer buf = getColumn().getBufferList().get(pos);
+//		return buf.getSize();
+//	}
 	
-	@JsonIgnore
-	public abstract CompressedList getColumn();
+//	@JsonIgnore
+//	public abstract CompressedList getColumn();
 	
 }

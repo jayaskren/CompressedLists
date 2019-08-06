@@ -1,5 +1,5 @@
 package com.compressedlists;
 
 public enum CompressionType {
-	NONE, GZIP, LZ4, SNAPPY, ZSTD
+	DEFAULT, GZIP, LZ4, SNAPPY, ZSTD
 }

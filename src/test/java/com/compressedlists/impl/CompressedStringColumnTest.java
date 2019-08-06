@@ -3,6 +3,8 @@ package com.compressedlists.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
+import com.compressedlists.DataTable;
+
 public class CompressedStringColumnTest {
 
 	@Test
@@ -19,5 +21,8 @@ public class CompressedStringColumnTest {
 			assertEquals("Test " + i, column.getValue(i));
 		}
 	}
+	
+	
+	
 
 }

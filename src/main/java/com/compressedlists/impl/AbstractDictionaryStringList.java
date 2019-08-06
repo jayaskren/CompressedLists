@@ -16,22 +16,29 @@ import it.unimi.dsi.fastutil.objects.Object2CharOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public abstract class AbstractDictionaryStringList implements StringList {
-	protected final int maxUniqueValues = (int) Math.pow(2,16)-1;
+	protected final int maxUniqueValues = (int) Math.pow(2,16);
 	protected final int maxSize = Integer.MAX_VALUE;
 //	Histogram histogram = new Histogram(3600000000000L, 3);
 	Object2CharOpenHashMap<String> uniqueValuesMap;
-	protected final List<String> uniqueValues = new ArrayList<String>();
+	protected List<String> uniqueValues = new ArrayList<String>();
 	protected final IntArrayList count;
 	protected long currentSizeBytes;
 	protected int size;
 	protected long uniqueValuesNumChars = 0l;
 	long totalTimeProcessed = 0l;
 	long originalSize = 0l;
+	
+	
 	public AbstractDictionaryStringList () {
 		uniqueValuesMap = new Object2CharOpenHashMap<String>();
 		count = new IntArrayList();
 	}
 	
+	public AbstractDictionaryStringList(List<String> uniqueValues) {
+		this.uniqueValues = uniqueValues;
+		count = new IntArrayList();
+	}
+
 	protected abstract void addIndex(int index);
 	
 	
@@ -41,9 +48,9 @@ public abstract class AbstractDictionaryStringList implements StringList {
 		
 		String uniqueString = val;
 		
-		if (hasMaxUniqueValues()) {
-			uniqueString = "[Other]";
-		} 
+//		if (hasMaxUniqueValues()) {
+//			uniqueString = "[Other]";
+//		} 
 		
 		if (uniqueValuesMap.containsKey(uniqueString)) {
 			uniqueValuesPosition = uniqueValuesMap.getChar(uniqueString);
