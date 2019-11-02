@@ -13,26 +13,23 @@ String first = lst.getValue();
 
 ## Converting a csv to the compressed list format:
 ```        
-public static void writeData(String[] inFilePaths, String outFolder) throws IOException {
-		File[] inFiles = new File[inFilePaths.length];
-		for (int i=0; i < inFiles.length; i++) {
-			inFiles[i] = new File(inFilePaths[i]);
-		}
-		DataTable table = 
-				FileUtils.readFile(inFiles, new Properties(), null);
-		long begin = System.currentTimeMillis();
-		table.writeData(new File(outFolder), CompressionType.DEFAULT);
-		System.out.println("Wrote Data in " + (System.currentTimeMillis() - begin)/1000.0 + " s");
-	}
+File[] inFiles = new File[inFilePaths.length];
+for (int i=0; i < inFiles.length; i++) {
+	inFiles[i] = new File(inFilePaths[i]);
+}
+DataTable table = 
+		FileUtils.readFile(inFiles, new Properties(), null);
+long begin = System.currentTimeMillis();
+table.writeData(new File(outFolder), CompressionType.DEFAULT);
+System.out.println("Wrote Data in " + (System.currentTimeMillis() - begin)/1000.0 + " s");
+
 ```
 
 ## Reading data from the compressed list format:
 ```
-	public static void readData(String inFolder) throws IOException {
-		long begin = System.currentTimeMillis();
-		DataTable table = DataTable.readData(new File(inFolder), null);
-		System.out.println("Loaded table with " +  
-				table.getNumRows() + " rows and " + table.getNumColumns() + " columns in "  + 
-				(System.currentTimeMillis() - begin)/1000.0 + " s");
-	}  
+long begin = System.currentTimeMillis();
+DataTable table = DataTable.readData(new File(inFolder), null);
+System.out.println("Loaded table with " +  
+		table.getNumRows() + " rows and " + table.getNumColumns() + " columns in "  + 
+		(System.currentTimeMillis() - begin)/1000.0 + " s");  
 ```
