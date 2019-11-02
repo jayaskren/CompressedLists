@@ -11,7 +11,7 @@ lst.addValue("Dog");
 String first = lst.getValue();
 ```
 
-## Converting a csv to the compressed list format:
+## Converting csv's with the same columns to the compressed list format:
 ```        
 File[] inFiles = new File[inFilePaths.length];
 for (int i=0; i < inFiles.length; i++) {
