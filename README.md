@@ -17,8 +17,7 @@ File[] inFiles = new File[inFilePaths.length];
 for (int i=0; i < inFiles.length; i++) {
 	inFiles[i] = new File(inFilePaths[i]);
 }
-DataTable table = 
-		FileUtils.readFile(inFiles, new Properties(), null);
+DataTable table = FileUtils.readFile(inFiles, new Properties(), null);
 long begin = System.currentTimeMillis();
 table.writeData(new File(outFolder), CompressionType.DEFAULT);
 System.out.println("Wrote Data in " + (System.currentTimeMillis() - begin)/1000.0 + " s");
