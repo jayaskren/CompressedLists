@@ -8,7 +8,7 @@ Strings are fairly robust.  Integers are still a work in progress.
 StringList lst = new StringListImpl()
 lst.addValue("Cat");
 lst.addValue("Dog");
-String first = lst.getValue();
+String first = lst.getValue(0);
 ```
 
 ## Converting csv's with the same columns to the compressed list format:
