@@ -126,10 +126,16 @@ public class BitUtil {
 	}
 	
 	public static int numBits(int i) {
-		if (i < 2) {
+		switch (i) {
+		case 0:
+//			return -1;
+		case 1:
 			return 0;
+		default:
+			return 31 - Integer.numberOfLeadingZeros((31 - Integer.numberOfLeadingZeros(i))<<1);
 		}
-		return 31 - Integer.numberOfLeadingZeros((31 - Integer.numberOfLeadingZeros(i))<<1);
+		
+		
 	}
 	
 	public static int log2nlz( int bits ) {
@@ -164,4 +170,15 @@ public class BitUtil {
 //
 //	
 
+	public static void main(String[] args) {
+		System.out.println(BitUtil.numBits(0));
+		System.out.println(BitUtil.numBits(1));
+		System.out.println(BitUtil.numBits(2));
+		System.out.println(BitUtil.numBits(3));
+		System.out.println(BitUtil.numBits(4));
+		System.out.println(BitUtil.numBits(5));
+		System.out.println(BitUtil.numBits(6));
+		System.out.println(BitUtil.numBits(7));
+		System.out.println(BitUtil.numBits(8));
+	}
 }

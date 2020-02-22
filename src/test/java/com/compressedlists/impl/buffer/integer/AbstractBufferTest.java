@@ -1,19 +1,22 @@
 package com.compressedlists.impl.buffer.integer;
 
+
+import static org.junit.Assert.assertEquals;
+
 import java.util.Random;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 
 public abstract class AbstractBufferTest {
 
 	int[] data;
 	
-	@BeforeEach 
-	protected void setUp() throws Exception {
+	@Before 
+	public void setUp() throws Exception {
 		data = new int[IIntMemoryBuffer.BUFFER_SIZE];
 		Random rand = new Random();
 		for(int i=0; i< IIntMemoryBuffer.BUFFER_SIZE; i++) {

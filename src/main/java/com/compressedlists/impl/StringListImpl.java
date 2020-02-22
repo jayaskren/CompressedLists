@@ -31,7 +31,7 @@ public class StringListImpl extends AbstractDictionaryStringList {
 		lastMemoryBuffer = createNewBuffer(0);
 	}
 	
-	public StringListImpl(List<String> uniqueValues, List<StringBufferMetadata> mdList) {
+	public StringListImpl(List<String> uniqueValues, List<StringBufferMetadata> mdList, long originalSizeInBytes) {
 		super(uniqueValues);
 		this.bufferList = new ArrayList<IIntMemoryBuffer>();
 		factory = new BufferCachingFactory();
@@ -43,6 +43,7 @@ public class StringListImpl extends AbstractDictionaryStringList {
 			this.count.add(0);
 		}
 		lastMemoryBuffer = null;
+		this.originalSize = originalSizeInBytes;
 	}
 	
 	protected void addIndex(int index) {

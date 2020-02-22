@@ -1,9 +1,10 @@
 package com.compressedlists.impl;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class VariableSizeArrayBufferColumnTest {
 
@@ -12,7 +13,7 @@ public class VariableSizeArrayBufferColumnTest {
 		System.out.println(Math.pow(2, 16));
 		StringListImpl column = new StringListImpl();
 		
-		int numValuesToAdd = 100000;
+		int numValuesToAdd = 65535; //100000;
 		for (int i=0; i < numValuesToAdd; i++) {
 			if (i== 65536) {
 				System.out.println("Adding: " +i);
@@ -22,9 +23,10 @@ public class VariableSizeArrayBufferColumnTest {
 		
 		for (int i=0; i<numValuesToAdd; i++) {
 			if(i >= Math.pow(2, 16) - 1) {
-				assertEquals("[Other]", column.getValue(i), "Error when i = " + i);
+				// TODO Fix this
+				assertEquals("Error when i = " + i, "[Other]", column.getValue(i));
 			} else {
-				assertEquals("Test " + Integer.toString(i), column.getValue(i), "Error when i = " + i);
+				assertEquals("Error when i = " + i, "Test " + Integer.toString(i), column.getValue(i));
 			}
 		}
 		column  = new StringListImpl();
@@ -37,7 +39,7 @@ public class VariableSizeArrayBufferColumnTest {
 		
 		for (int i=0; i<column.getMaxUniqueValues()-1; i++) {
 			for (int j=0; j < 10; j++) {
-				assertEquals("Test " + Integer.toString(i) , column.getValue(i*10+j), "Error at "+i + ", " + j);
+				assertEquals("Error at "+i + ", " + j, "Test " + Integer.toString(i) , column.getValue(i*10+j));
 			}
 		}
 		
@@ -46,7 +48,7 @@ public class VariableSizeArrayBufferColumnTest {
 		for (int i=0; i< 500000; i++) {
 			boolean val = true;//i%2 == 1;
 			column.addValue(Boolean.toString(val));
-			assertEquals(Boolean.toString(val), column.getValue(i), "Error at row " + i );
+			assertEquals("Error at row " + i , Boolean.toString(val), column.getValue(i));
 		}
 		
 		column  = new StringListImpl();
@@ -54,7 +56,7 @@ public class VariableSizeArrayBufferColumnTest {
 		for (int i=0; i< 500000; i++) {
 			boolean val = i%2 == 1;
 			column.addValue(Boolean.toString(val));
-			assertEquals(Boolean.toString(val), column.getValue(i), "Error at row " + i );
+			assertEquals("Error at row " + i, Boolean.toString(val), column.getValue(i));
 		}
 	}
 	

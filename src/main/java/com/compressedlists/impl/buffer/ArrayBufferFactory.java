@@ -1,5 +1,6 @@
 package com.compressedlists.impl.buffer;
 
+import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer0;
 import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer1;
 import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer16;
 import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer2;
@@ -16,6 +17,8 @@ public class ArrayBufferFactory {
 	
 	public IIntMemoryBuffer createBuffer(int numBits) {
 		switch (numBits) {
+		case -1:
+//			return new UnsignedIntArrayBuffer0();
 		case 0: // 0-1
 //			return new BitSetMemoryBuffer1();
 				return new UnsignedIntArrayBuffer1();

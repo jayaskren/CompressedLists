@@ -1,9 +1,11 @@
 package com.compressedlists.impl.buffer.integer.unsafe;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.reflect.Field;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+
 import sun.misc.Unsafe;
 
 public class UnsafeTest {
@@ -29,13 +31,13 @@ private static final Unsafe unsafe;
 		
 		for (int i=0; i< data.length ; i++) {
 			unsafe.putInt(data, address + i * numBytesPerRow, i);
-			assertEquals(i, unsafe.getInt(data, address + (i)*numBytesPerRow), "Failed when i = " + i);
-			assertEquals(i, data[i], "Failed when i = " + i);
+			assertEquals("Failed when i = " + i, i, unsafe.getInt(data, address + (i)*numBytesPerRow));
+			assertEquals("Failed when i = " + i, i, data[i]);
 		}
 		
 		for (int i=0; i< data.length ; i++) {
-			assertEquals(i, unsafe.getInt(data, address + (i)*numBytesPerRow), "Failed when i = " + i);
-			assertEquals(i, data[i], "Failed when i = " + i);
+			assertEquals("Failed when i = " + i, i, unsafe.getInt(data, address + (i)*numBytesPerRow));
+			assertEquals("Failed when i = " + i, i, data[i]);
 		}
 	}
 

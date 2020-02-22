@@ -1,12 +1,10 @@
 package com.compressedlists.impl.buffer.integer.unsafe;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Random;
 
-import com.compressedlists.impl.buffer.integer.unsafe.AbstractUnsafeBuffer;
-import com.compressedlists.impl.buffer.integer.unsafe.UnsignedUnsafeBuffer16;
-
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class UnsafeBuffer16Test {
 
@@ -21,11 +19,11 @@ public class UnsafeBuffer16Test {
 			int val = i;//rand.nextInt(65536);
 			values[i] = val;
 			buffer1.addValue(val);
-			assertEquals(val, buffer1.getValue(i), "Error when i = " + i);
+			assertEquals("Error when i = " + i, val, buffer1.getValue(i));
 		}
 		
 		for (int i=0; i < UnsignedUnsafeBuffer16.BUFFER_SIZE ; i++) {
-			assertEquals(values[i], buffer1.getValue(i), "Error when i = " + i);
+			assertEquals("Error when i = " + i, values[i], buffer1.getValue(i));
 		}
 	
 	}

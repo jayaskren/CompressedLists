@@ -71,7 +71,7 @@ public abstract class AbstractDictionaryStringList implements StringList {
 //		histogram.recordValue(timeProcessed);
 	}
 	
-	/**This list can only handle 2^16 unique values*/
+	/**Check if the list has over 2^16 unique values*/
 	public boolean hasMaxUniqueValues() {
 		return getUniqueValuesSize() >= maxUniqueValues;
 	}

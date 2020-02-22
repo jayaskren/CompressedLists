@@ -17,6 +17,7 @@ public class ColumnMetadata {
 	
 	private List<String> uniqueValues;
 	private List<BufferMetadata> bufferMetadata;
+	private long originalSizeInBytes;
 	
 	@JsonCreator
 	public ColumnMetadata( @JsonProperty("uniqueValues") List<String> uniqueValues, 
@@ -28,6 +29,7 @@ public class ColumnMetadata {
 	public ColumnMetadata(String name, CompressedList column) {
 		this.column = column;
 		this.name = name;
+		this.originalSizeInBytes = column.getOriginalSizeInBytes();
 		if (column instanceof StringListImpl) {
 			StringListImpl col = (StringListImpl) column;
 			uniqueValues = col.getUniqueValues();
@@ -73,6 +75,14 @@ public class ColumnMetadata {
 
 	public List<BufferMetadata> getBufferMetadata() {
 		return bufferMetadata;
+	}
+
+	public long getOriginalSizeInBytes() {
+		return originalSizeInBytes;
+	}
+
+	public void setOriginalSizeInBytes(long originalSizeInBytes) {
+		this.originalSizeInBytes = originalSizeInBytes;
 	}
 
 }

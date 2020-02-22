@@ -1,5 +1,7 @@
 package com.compressedlists.impl.buffer;
 
+import static org.junit.Assert.assertEquals;
+
 import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer1;
 import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer16;
 import com.compressedlists.impl.buffer.integer.array.UnsignedIntArrayBuffer2;
@@ -12,9 +14,6 @@ import com.compressedlists.impl.buffer.integer.bitset.BitSetMemoryBuffer4;
 import com.compressedlists.impl.buffer.integer.unsafe.SignedUnsafeBuffer32;
 import com.compressedlists.impl.buffer.integer.unsafe.UnsignedUnsafeBuffer16;
 import com.compressedlists.impl.buffer.integer.unsafe.UnsignedUnsafeBuffer8;
-
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
 
 public class BufferFactoryTest {
 

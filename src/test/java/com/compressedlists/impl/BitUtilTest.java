@@ -1,11 +1,12 @@
 package com.compressedlists.impl;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import com.compressedlists.impl.buffer.BitUtil;
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 import com.compressedlists.impl.buffer.IStringArrayBuffer;
-
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
 
 public class BitUtilTest {
 
@@ -156,7 +157,7 @@ public class BitUtilTest {
 //		assertEquals(128, BitUtil.packByteUnsigned(128));
 		for (int i=0; i<256 ; i++) {
 			packedByte = BitUtil.packByteUnsigned(i);
-			assertEquals(i, BitUtil.unpackByteUnsigned(packedByte), "Error when: i=" + i);
+			assertEquals("Error when: i=" + i, i, BitUtil.unpackByteUnsigned(packedByte));
 		}
 	}
 	
@@ -198,7 +199,7 @@ public class BitUtilTest {
 	public void testNumBitsBinLog() {
 		for (int i=2; i<100000; i++) {
 //			System.out.println(i + ": " +(BitUtil.binlog(BitUtil.binlog(i)) + 1) + " =? "  + BitUtil.numBits(i));
-			assertEquals(BitUtil.binlog(BitUtil.binlog(i)) + 1, BitUtil.numBits(i), "Not Equal for i = "+i);
+			assertEquals("Not Equal for i = "+i, BitUtil.binlog(BitUtil.binlog(i)) + 1, BitUtil.numBits(i));
 		}
 	}
 	

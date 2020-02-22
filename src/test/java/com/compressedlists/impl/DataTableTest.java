@@ -1,13 +1,13 @@
 package com.compressedlists.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import com.compressedlists.CompressedList;
 import com.compressedlists.CompressionType;
@@ -29,24 +29,24 @@ public class DataTableTest {
 			assertEquals(20, newTable.getNumRows());
 
 			for (int i=0; i < 20; i++) {
-				assertEquals(Integer.toString(i+1), newTable.getColumns()[0].getValueDisplay(i), "Error when row=" + i + " and column=0");
+				assertEquals("Error when row=" + i + " and column=0", Integer.toString(i+1), newTable.getColumns()[0].getValueDisplay(i));
 			}
 			
 			for (int i=0; i < 20; i++) {
-				assertEquals(Integer.toString((i/4)+1), newTable.getColumns()[1].getValueDisplay(i), "Error when row=" + i + " and column=1");
+				assertEquals("Error when row=" + i + " and column=1", Integer.toString((i/4)+1), newTable.getColumns()[1].getValueDisplay(i));
 			}
 			
 			for (int i=0; i < 20; i++) {
-				assertEquals("1", newTable.getColumns()[2].getValueDisplay(i), "Error when row=" + i + " and column=2");
+				assertEquals("Error when row=" + i + " and column=2", "1", newTable.getColumns()[2].getValueDisplay(i));
 			}
 			
 			for (int i=0; i < 20; i++) {
-				assertEquals(Integer.toString(20-i), newTable.getColumns()[3].getValueDisplay(i), "Error when row=" + i + " and column=2");
+				assertEquals("Error when row=" + i + " and column=2", Integer.toString(20-i), newTable.getColumns()[3].getValueDisplay(i));
 			}
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-			fail(e);
+			fail(e.getMessage());
 		}
 	}
 	
@@ -70,23 +70,22 @@ public class DataTableTest {
 		assertEquals(numRows, table.getNumRows());
 		
 		for (int i=0; i < numRows; i++) {
-			assertEquals(Integer.toString(i%300), table.getColumns()[0].getValueDisplay(i), "Error when row=" + i + " and column=0");
-			assertEquals("Foo", table.getColumns()[1].getValueDisplay(i), "Error when row=" + i + " and column=1");
-			assertEquals(Integer.toString(i%30000), table.getColumns()[2].getValueDisplay(i), "Error when row=" + i + " and column=2");
-			assertEquals(Integer.toString(i), table.getColumns()[3].getValueDisplay(i), "Error when row=" + i + " and column=3");
+			assertEquals("Error when row=" + i + " and column=0", Integer.toString(i%300), table.getColumns()[0].getValueDisplay(i));
+			assertEquals("Error when row=" + i + " and column=1", "Foo", table.getColumns()[1].getValueDisplay(i));
+			assertEquals("Error when row=" + i + " and column=2", Integer.toString(i%30000), table.getColumns()[2].getValueDisplay(i));
+			assertEquals("Error when row=" + i + " and column=3", Integer.toString(i), table.getColumns()[3].getValueDisplay(i));
 		}
 		
 		table.writeData(new File("/tmp/test2/"), CompressionType.DEFAULT);
 		DataTable newTable = DataTable.readData(new File("/tmp/test2"), null);
 		assertEquals(4, newTable.getNumColumns());
 		assertEquals(numRows, newTable.getNumRows());
-		
-		// TODO Why are there two buffers when there should be one.  
-		for (int i=0; i < numRows; i++) { // breaks half way through
-			assertEquals(Integer.toString(i%300), ((StringListImpl)newTable.getColumns()[0]).getValue(i), "Error when row=" + i + " and column=0");
-			assertEquals("Foo", newTable.getColumns()[1].getValueDisplay(i), "Error when row=" + i + " and column=1");
-			assertEquals(Integer.toString(i%30000), newTable.getColumns()[2].getValueDisplay(i), "Error when row=" + i + " and column=2");
-			assertEquals(Integer.toString(i), newTable.getColumns()[3].getValueDisplay(i), "Error when row=" + i + " and column=3");
+		 
+		for (int i=0; i < numRows; i++) { 
+			assertEquals("Error when row=" + i + " and column=0", Integer.toString(i%300), ((StringListImpl)newTable.getColumns()[0]).getValue(i));
+			assertEquals("Error when row=" + i + " and column=1", "Foo", newTable.getColumns()[1].getValueDisplay(i));
+			assertEquals("Error when row=" + i + " and column=2", Integer.toString(i%30000), newTable.getColumns()[2].getValueDisplay(i));
+			assertEquals("Error when row=" + i + " and column=3", Integer.toString(i), newTable.getColumns()[3].getValueDisplay(i));
 		}
 		
 	}

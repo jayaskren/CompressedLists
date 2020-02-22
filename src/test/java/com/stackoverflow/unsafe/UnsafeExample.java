@@ -1,6 +1,6 @@
 package com.stackoverflow.unsafe;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class UnsafeExample {
 

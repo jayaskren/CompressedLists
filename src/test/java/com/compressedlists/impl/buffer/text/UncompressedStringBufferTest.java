@@ -1,24 +1,27 @@
 package com.compressedlists.impl.buffer.text;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 public class UncompressedStringBufferTest {
 
+	@Test
 	public void testAddValue() {
 		UncompressedStringBuffer buffer = new UncompressedStringBuffer();
 		for (int i=0;i < UncompressedStringBuffer.BUFFER_SIZE ; i++) {
 			String val1 = "Test " + i;
 			String val2 = "Test Again " + i;
 			buffer.addValue(val1);
-			assertEquals("Add Value Failed when i= " + i, val1, buffer.getValue(i));
+			assertEquals("Test " + i, val1, buffer.getValue(i));
 			
 			buffer.setValue(i, val2);
-			assertEquals("SetValue Failed when i= " + i, val2, buffer.getValue(i));
+			assertEquals("Test Again " + i, val2, buffer.getValue(i));
 			assertEquals(i+1, buffer.getSize());
 		}
 		
-		// TODO 
+//		// TODO 
 //		CompressedStringBuffer compressed = buffer.compressToBuffer();
 //		assertTrue("Compressed: " + compressed.getSizeInBytes() +", Uncompressed: " + buffer.getSizeInBytes(), 
 //				compressed.getSizeInBytes() < buffer.getSizeInBytes());

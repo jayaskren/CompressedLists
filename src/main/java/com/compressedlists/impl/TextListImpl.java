@@ -30,13 +30,14 @@ public class TextListImpl implements TextList {
 	long totalTimeProcessed = 0l;
 	long originalSize = 0l;
 	
-	public TextListImpl(List<TextBufferMetadata> mdList) {
+	public TextListImpl(List<TextBufferMetadata> mdList, long originalSizeInBytes) {
 		this.buffers = new ArrayList<>();
 		for (int i=0; i < mdList.size() - 1; i++) {
 			buffers.add(new CompressedStringBuffer(mdList.get(i).getUncompressedByteSize()));
 		}
 		lastStringBuffer=new UncompressedStringBuffer();
 		retrievedStringBuffer = new UncompressedStringBuffer();
+		this.originalSize = originalSizeInBytes;
 	}
 	
 	public TextListImpl(TextList column) {

@@ -1,9 +1,8 @@
 package com.compressedlists.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.assertEquals;
 
-import com.compressedlists.DataTable;
+import org.junit.Test;
 
 public class CompressedStringColumnTest {
 
@@ -13,8 +12,8 @@ public class CompressedStringColumnTest {
 		int numRows = 100000;
 		for(int i=0; i<numRows ; i++) {
 			column.addValue("Test " + i);
-			assertEquals(i+1, column.getSize(), "Failed at row "  + i);
-			assertEquals("Test " + i, column.getValue(i), "Failed at row "  + i);
+			assertEquals("Failed at row "  + i, i+1, column.getSize());
+			assertEquals("Failed at row "  + i, "Test " + i, column.getValue(i));
 		}
 		
 		for(int i=0; i<numRows ; i++) {

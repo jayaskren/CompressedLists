@@ -37,6 +37,7 @@ public abstract class BufferMetadata {
 		this.numRows = numRows;
 	}
 	
+	
 //	@JsonIgnore
 //	public int getNumRecords() {
 //		IMemoryBuffer buf = getColumn().getBufferList().get(pos);

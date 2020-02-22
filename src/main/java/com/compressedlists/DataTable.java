@@ -78,7 +78,6 @@ public class DataTable {
 	}
 	
 	public void writeData(File folder, CompressionType compression) throws IOException {
-		// TODO write column name, type, location, into metadata.json
 		// use json iterator/any from jsonitor
 		folder.mkdirs();
 		String fileName = "metadata.json";
@@ -168,6 +167,7 @@ public class DataTable {
 			CompressedList col = null;
 			int bufCount = 0;
 			Any bufMdAny = colMdAny.get("bufferMetadata");
+			long originalSizeInBytes = colMdAny.get("originalSizeInBytes").toLong();
 			
 			ListIterator<Any> bufIter = bufMdAny.asList().listIterator();
 			
@@ -197,7 +197,7 @@ public class DataTable {
 					stringBufDataList.add(md);
 					bufCount ++;
 				}
-				col = new StringListImpl(tempUniqueValuesList, stringBufDataList);
+				col = new StringListImpl(tempUniqueValuesList, stringBufDataList, originalSizeInBytes);
 				
 				for (int i=0; i < stringBufDataList.size(); i++) {
 					try (RandomAccessFile file = new RandomAccessFile(new File(folder, "index_"+ i + ".dat"), "r")) {
@@ -221,7 +221,7 @@ public class DataTable {
 					textBufDataList.add(md);
 					bufCount ++;
 				}
-				col = new TextListImpl(textBufDataList);
+				col = new TextListImpl(textBufDataList, originalSizeInBytes);
 				
 				for (int i=0; i < textBufDataList.size(); i++) {
 					try (RandomAccessFile file = new RandomAccessFile(new File(folder, "index_"+ i + ".dat"), "r")) {
@@ -237,6 +237,7 @@ public class DataTable {
 			default:
 				break;
 			}
+			
 			columns[colNum] = col;
 			colNum++;
 			if (progress != null) {
@@ -246,7 +247,7 @@ public class DataTable {
 		
 		String[] header = columnNames.toArray(new String[columnNames.size()]);
 		DataTable table = new DataTable(columns, header, header);
-		System.out.println("Loaded in " + (System.currentTimeMillis() - begin) + "ms");
+		System.out.println("Loaded in " + (System.currentTimeMillis() - begin) + " ms");
 		if (progress != null) {
 			progress.finish();
 		}

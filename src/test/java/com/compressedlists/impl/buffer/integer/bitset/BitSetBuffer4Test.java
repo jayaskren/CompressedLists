@@ -1,10 +1,11 @@
 package com.compressedlists.impl.buffer.integer.bitset;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import com.compressedlists.impl.buffer.IIntMemoryBuffer;
 import com.compressedlists.impl.buffer.integer.AbstractBufferTest;
-import com.compressedlists.impl.buffer.integer.bitset.BitSetMemoryBuffer4;
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
 
 public class BitSetBuffer4Test extends AbstractBufferTest {
 
